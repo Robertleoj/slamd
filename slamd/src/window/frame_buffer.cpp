@@ -159,12 +159,12 @@ void FrameBuffer::resolve() {
     gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::rescale(
+bool FrameBuffer::rescale(
     size_t width,
     size_t height
 ) {
     if (width == current_width && height == current_height) {
-        return;
+        return false;
     }
 
     current_width = width;
@@ -211,6 +211,7 @@ void FrameBuffer::rescale(
         width,
         height
     );
+    return true;
 }
 
 double FrameBuffer::aspect() const {

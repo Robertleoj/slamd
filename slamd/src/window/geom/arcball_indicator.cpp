@@ -118,6 +118,15 @@ void ArcballIndicator::render(
     gl::glBindVertexArray(0);
 };
 
+bool ArcballIndicator::is_animating() const {
+    if (!this->last_interacted.has_value()) {
+        return false;
+    }
+    auto now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> secs = now - last_interacted.value();
+    return secs.count() < 0.4f;
+}
+
 void ArcballIndicator::set_arcball_zoom(
     float zoom
 ) {

@@ -21,7 +21,7 @@ def random_poses(n: int, t_scale: float = 10.0) -> np.ndarray:
 
 
 def main():
-    vis = slamd.Visualizer("poses")
+    vis = slamd.Visualizer("poses", port=4399)
     scene = vis.scene("poses")
 
     for i, pose_mat in enumerate(random_poses(100, 10)):

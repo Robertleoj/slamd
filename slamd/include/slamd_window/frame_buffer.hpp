@@ -24,7 +24,7 @@ class FrameBuffer {
     ~FrameBuffer();
 
     uint32_t frame_texture();  // Resolved texture ID
-    void rescale(size_t width, size_t height);
+    bool rescale(size_t width, size_t height);
     void bind();     // Bind MSAA FBO for rendering
     void unbind();   // Unbind
     void resolve();  // Blit MSAA → resolved texture

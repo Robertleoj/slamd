@@ -15,6 +15,7 @@ class ArcballIndicator : public Geometry {
 
     void set_arcball_zoom(float zoom);
     void interact();
+    bool is_animating() const;
 
    private:
     static glm::mat4 get_scale_mat(float scale);
