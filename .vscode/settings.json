@@ -1,7 +1,7 @@
 {
   "clangd.arguments": [
-    // "--compile-commands-dir=python_examples/build",
-    "--compile-commands-dir=examples/build",
+    "--compile-commands-dir=python_bindings/build",
+    // "--compile-commands-dir=examples/build",
     "--function-arg-placeholders=false",
     "--tweaks=-Wall",
     "--tweaks=-Wextra",
@@ -120,7 +120,7 @@
   "C_Cpp.inlayHints.parameterNames.enabled": true,
   "C_Cpp.inlayHints.referenceOperator.enabled": true,
   "python.analysis.extraPaths": ["python_bindings/src/"],
-  "cmake.sourceDirectory": "/home/robert/learning/slam_dunk/examples",
+  "cmake.sourceDirectory": "/home/robert/projects/slam_dunk/examples",
   "python.analysis.exclude": [
     "**/build/",
     "**/.venv/",

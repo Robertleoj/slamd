@@ -6,10 +6,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <spdlog/spdlog.h>
-#include <slamd_window/frame_timer.hpp>
 #include <slamd_window/glfw.hpp>
 #include <slamd_window/run_window.hpp>
-#include <thread>
 
 namespace slamd {
 
@@ -375,7 +373,6 @@ void run_window(
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
-    FrameTimer frame_timer;
     bool loaded_layout = false;
     bool checked_layout = false;
 
@@ -453,17 +450,6 @@ void run_window(
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        frame_timer.log_frame();
-        float frame_time = frame_timer.timedelta();
-        constexpr double target_frame_time = 1.0 / 120.0;
-
-        if (frame_time < target_frame_time) {
-            float sleep_duration = target_frame_time - frame_time;
-            std::this_thread::sleep_for(
-                std::chrono::duration<float>(sleep_duration)
-            );
-        }
     }
 
     SPDLOG_INFO("Window closed!");
