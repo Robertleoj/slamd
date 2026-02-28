@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "slamd"
-version = "2.1.12"
+version = "2.1.13"
 description = "Python bindings for SlamDunk"
 authors = [{ name = "Robert Leo", email = "robert.leo.jonsson@gmail.com" }]
 readme = "README.md"
