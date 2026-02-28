@@ -27,7 +27,6 @@ GLFWwindow* make_window(
     SPDLOG_INFO("GLFW window created");
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
 
     glbinding::initialize(glfwGetProcAddress);
 
