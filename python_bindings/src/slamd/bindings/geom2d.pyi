@@ -3,7 +3,7 @@ import bindings._geom
 import numpy
 import typing
 __all__ = ['Circles', 'Image', 'Points', 'PolyLine']
-def Circles(positions: numpy.ndarray, colors: numpy.ndarray, radii: list[float] | numpy.ndarray, thickness: typing.SupportsFloat = 0.1) -> bindings._geom.Circles2D:
+def Circles(positions: numpy.ndarray, colors: numpy.ndarray, radii: list[float] | numpy.ndarray, thickness: typing.SupportsFloat | typing.SupportsIndex = 0.1) -> bindings._geom.Circles2D:
     """
     Create a set of circles
     """
@@ -15,7 +15,7 @@ def Points(positions: numpy.ndarray, colors: numpy.ndarray, radii: list[float] |
     """
     Create 2D points with per-point color and radius
     """
-def PolyLine(points: numpy.ndarray, color: numpy.ndarray, thickness: typing.SupportsFloat) -> bindings._geom.PolyLine2D:
+def PolyLine(points: numpy.ndarray, color: numpy.ndarray, thickness: typing.SupportsFloat | typing.SupportsIndex) -> bindings._geom.PolyLine2D:
     """
     Create a 2D poly line
     """

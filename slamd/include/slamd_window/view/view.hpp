@@ -12,7 +12,10 @@ class View {
     static std::unique_ptr<View>
     deserialize(const flatb::View* view, std::shared_ptr<Tree> tree);
 
+    void mark_dirty();
+
    public:
+    bool _dirty = true;
     std::shared_ptr<Tree> tree;
     std::unordered_map<Node*, bool> tree_open;
     std::optional<std::string> visualize_glob = std::nullopt;

@@ -20,7 +20,7 @@ class StateManager {
 
     void try_connect(std::string ip = "127.0.0.1", ushort port = 5555);
 
-    void apply_updates();
+    bool apply_updates();
 
    private:
     void handle_initial_state(const slamd::flatb::InitialState* initial_state);

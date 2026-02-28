@@ -28,9 +28,15 @@ void SceneView::render_to_imgui() {
     ImVec2 availSize = ImGui::GetContentRegionAvail();
     int width = static_cast<int>(availSize.x);
     int height = static_cast<int>(availSize.y);
-    this->frame_buffer.rescale(width, height);
+    bool resized = this->frame_buffer.rescale(width, height);
 
-    this->render_to_frame_buffer();
+    bool need_render =
+        this->_dirty || resized || this->arcball_indicator.is_animating();
+
+    if (need_render) {
+        this->render_to_frame_buffer();
+        this->_dirty = false;
+    }
 
     ImGui::Image(
         (ImTextureID)this->frame_buffer.frame_texture(),
@@ -83,6 +89,7 @@ void SceneView::handle_input() {
             this->xy_grid.set_arcball_zoom(this->arcball.radius);
             this->arcball_indicator.set_arcball_zoom(this->arcball.radius);
             this->arcball_indicator.interact();
+            this->mark_dirty();
         }
     }
 }
@@ -119,6 +126,7 @@ void SceneView::handle_mouse_input() {
                 -slamd::gmath::Angle::rad(y_angle_diff)
             );
             this->arcball_indicator.interact();
+            this->mark_dirty();
         }
 
         if (io.MouseWheel != 0.0f) {
@@ -136,6 +144,7 @@ void SceneView::handle_mouse_input() {
             this->xy_grid.set_arcball_zoom(this->arcball.radius);
             this->arcball_indicator.set_arcball_zoom(this->arcball.radius);
             this->arcball_indicator.interact();
+            this->mark_dirty();
         }
     }
 }
@@ -175,6 +184,7 @@ void SceneView::handle_translation_input() {
     if (glm::length(translation) > 1e-6f) {
         this->arcball.translate_relative(translation);
         this->arcball_indicator.interact();
+        this->mark_dirty();
     }
 }
 

@@ -9,6 +9,10 @@ View::View(
 )
     : tree(std::move(t)) {}
 
+void View::mark_dirty() {
+    this->_dirty = true;
+}
+
 std::unique_ptr<View> View::deserialize(
     const flatb::View* view_fb,
     std::shared_ptr<Tree> tree

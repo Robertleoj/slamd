@@ -21,7 +21,7 @@ void CanvasView::render_to_imgui() {
 
     int width = static_cast<int>(image_size.x);
     int height = static_cast<int>(image_size.y);
-    this->frame_buffer.rescale(width, height);
+    bool resized = this->frame_buffer.rescale(width, height);
 
     if (!this->manually_moved) {
         this->set_default_pos();
@@ -29,7 +29,12 @@ void CanvasView::render_to_imgui() {
         this->fix_view_aspect();
     }
 
-    this->render_to_frame_buffer();
+    bool need_render = this->_dirty || resized;
+
+    if (need_render) {
+        this->render_to_frame_buffer();
+        this->_dirty = false;
+    }
 
     ImGui::Image(
         (ImTextureID)this->frame_buffer.frame_texture(),
@@ -99,6 +104,7 @@ void CanvasView::handle_input() {
         if (ImGui::IsKeyPressed(ImGuiKey_Period, false)) {
             this->set_default_pos();
             this->manually_moved = false;
+            this->mark_dirty();
         }
     }
 }
@@ -127,6 +133,7 @@ void CanvasView::handle_mouse_input() {
                 {-mouse_drag_delta_x, -mouse_drag_delta_y}
             );
             this->manually_moved = true;
+            this->mark_dirty();
         }
 
         if (io.MouseWheel != 0.0f) {
@@ -140,6 +147,7 @@ void CanvasView::handle_mouse_input() {
             );
 
             this->manually_moved = true;
+            this->mark_dirty();
         }
     }
 }
@@ -194,11 +202,13 @@ void CanvasView::handle_translation_input() {
     if (glm::length(translation) > 1e-6f) {
         this->manually_moved = true;
         this->camera.translate_relative(translation);
+        this->mark_dirty();
     }
 
     if (glm::abs(zoom) > 1e-6f) {
         this->manually_moved = true;
         this->camera.zoom_relative(zoom);
+        this->mark_dirty();
     }
 }
 

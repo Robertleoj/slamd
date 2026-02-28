@@ -247,19 +247,21 @@ void StateManager::handle_update_point_cloud_radii(
     geom->update_radii(data);
 }
 
-void StateManager::apply_updates() {
+bool StateManager::apply_updates() {
     if (!this->connection.has_value()) {
-        return;
+        return false;
     }
 
     auto& connection = this->connection.value();
     auto& message_queue = connection.messages;
+    bool had_updates = false;
 
     while (true) {
         auto maybe_message = message_queue.try_pop();
         if (!maybe_message.has_value()) {
-            return;
+            return had_updates;
         }
+        had_updates = true;
         auto message = std::move(maybe_message.value());
 
         auto message_fb = message->msg();
