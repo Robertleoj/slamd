@@ -16,6 +16,7 @@ slamd-window = "slamd:_window_cli"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
+cmake.build-type = "MinSizeRel"
 
 [tool.cibuildwheel]
 skip = ["*musllinux*", "*win*", "pp*"]

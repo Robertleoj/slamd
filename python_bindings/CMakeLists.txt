@@ -8,6 +8,18 @@ set(LIB_DIR vendored_deps)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BUILD_SHARED_LIBS OFF)
 
+# Disable unnecessary sub-targets from vendored deps
+set(OPTION_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "" FORCE)
+set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "" FORCE)
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
@@ -24,30 +36,32 @@ endif()
 add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF)
 
 
+# EXCLUDE_FROM_ALL prevents vendored deps from installing their own
+# files (static archives, examples, tools) into the wheel.
 if(NOT TARGET spdlog::spdlog)
     message(STATUS "Adding spdlog...")
-    add_subdirectory(${LIB_DIR}/spdlog)
+    add_subdirectory(${LIB_DIR}/spdlog EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET glbinding::glbinding-aux)
     message(STATUS "Adding glbinding...")
-    add_subdirectory(${LIB_DIR}/glbinding)
+    add_subdirectory(${LIB_DIR}/glbinding EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET glfw)
     message(STATUS "Adding glfw...")
-    add_subdirectory(${LIB_DIR}/glfw)
+    add_subdirectory(${LIB_DIR}/glfw EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET imgui::imgui)
     message(STATUS "Adding imgui...")
-    add_subdirectory(${LIB_DIR}/imgui_wrapper)
+    add_subdirectory(${LIB_DIR}/imgui_wrapper EXCLUDE_FROM_ALL)
 endif()
 
 
 if(NOT TARGET slamd)
     message(STATUS "Adding slamd...")
-    add_subdirectory(slamd_src)
+    add_subdirectory(slamd_src EXCLUDE_FROM_ALL)
 endif()
 
 
@@ -96,5 +110,12 @@ target_link_libraries(bindings
         fmt::fmt
 )
 
+# slamd_window is excluded from ALL due to EXCLUDE_FROM_ALL on slamd_src,
+# so we need to make bindings depend on it to ensure it gets built.
+add_dependencies(bindings slamd_window)
+
 install(TARGETS slamd_window DESTINATION slamd)
 install(TARGETS bindings DESTINATION slamd)
+
+# Strip installed binaries to reduce wheel size
+set(CMAKE_INSTALL_DO_STRIP ON)

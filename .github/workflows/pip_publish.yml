@@ -40,7 +40,6 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y epel-release && \
             yum install -y \
-              glfw-devel \
               libX11-devel \
               libXcursor-devel \
               libXrandr-devel \
@@ -48,10 +47,7 @@ jobs:
               libXi-devel \
               wayland-devel \
               mesa-libEGL-devel \
-              mesa-libGLES-devel \
-              SDL2-devel \
-              qt5-qtbase-devel \
-              gtk3-devel
+              mesa-libGLES-devel
         run: |
           cd python_bindings
           cibuildwheel --output-dir dist
