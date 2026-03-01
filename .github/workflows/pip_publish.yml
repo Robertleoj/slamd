@@ -46,6 +46,7 @@ jobs:
               libXinerama-devel \
               libXi-devel \
               wayland-devel \
+              libxkbcommon-devel \
               mesa-libEGL-devel \
               mesa-libGLES-devel
         run: |
