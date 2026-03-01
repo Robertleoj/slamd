@@ -32,39 +32,11 @@ else()
     set(INSTALL_PATH "$ORIGIN")
 endif()
 
-
 add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF)
-
 
 # EXCLUDE_FROM_ALL prevents vendored deps from installing their own
 # files (static archives, examples, tools) into the wheel.
-if(NOT TARGET spdlog::spdlog)
-    message(STATUS "Adding spdlog...")
-    add_subdirectory(${LIB_DIR}/spdlog EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET glbinding::glbinding-aux)
-    message(STATUS "Adding glbinding...")
-    add_subdirectory(${LIB_DIR}/glbinding EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET glfw)
-    message(STATUS "Adding glfw...")
-    add_subdirectory(${LIB_DIR}/glfw EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET imgui::imgui)
-    message(STATUS "Adding imgui...")
-    add_subdirectory(${LIB_DIR}/imgui_wrapper EXCLUDE_FROM_ALL)
-endif()
-
-
-if(NOT TARGET slamd)
-    message(STATUS "Adding slamd...")
-    add_subdirectory(slamd_src EXCLUDE_FROM_ALL)
-endif()
-
-
+add_subdirectory(slamd_src EXCLUDE_FROM_ALL)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module REQUIRED)
 
@@ -96,13 +68,13 @@ target_include_directories(
         ${LIB_DIR}/glfw/include
 )
 
-target_link_libraries(bindings 
+target_link_libraries(bindings
     PUBLIC
         slamd::slamd
         slamd_common
         slamd_flatbuff
 
-    PRIVATE 
+    PRIVATE
         imgui::imgui
         glfw
         glbinding::glbinding
