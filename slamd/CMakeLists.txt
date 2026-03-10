@@ -9,30 +9,37 @@ project(slam_dunk VERSION 0.1.0)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(LIB_DIR vendored_deps)
+if(NOT DEFINED LIB_DIR)
+    set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendored_deps)
+endif()
 
 if(NOT TARGET glbinding::glbinding-aux)
-    add_subdirectory(${LIB_DIR}/glbinding)
+    add_subdirectory(${LIB_DIR}/glbinding ${CMAKE_CURRENT_BINARY_DIR}/_deps/glbinding)
 endif()
 
 if(NOT TARGET glfw)
-    add_subdirectory(${LIB_DIR}/glfw)
+    add_subdirectory(${LIB_DIR}/glfw ${CMAKE_CURRENT_BINARY_DIR}/_deps/glfw)
 endif()
 
 if(NOT TARGET spdlog::spdlog)
-    add_subdirectory(${LIB_DIR}/spdlog)
+    add_subdirectory(${LIB_DIR}/spdlog ${CMAKE_CURRENT_BINARY_DIR}/_deps/spdlog)
 endif()
 
 if(NOT TARGET imgui::imgui)
-    add_subdirectory(${LIB_DIR}/imgui_wrapper)
+    add_subdirectory(${LIB_DIR}/imgui_wrapper ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui_wrapper)
 endif()
 
 if(NOT TARGET fmt::fmt)
-    add_subdirectory(${LIB_DIR}/fmt)
+    add_subdirectory(${LIB_DIR}/fmt ${CMAKE_CURRENT_BINARY_DIR}/_deps/fmt)
 endif()
 
-add_subdirectory(${LIB_DIR}/glm)
-add_subdirectory(${LIB_DIR}/cxxopts)
+if(NOT TARGET glm::glm)
+    add_subdirectory(${LIB_DIR}/glm ${CMAKE_CURRENT_BINARY_DIR}/_deps/glm)
+endif()
+
+if(NOT TARGET cxxopts)
+    add_subdirectory(${LIB_DIR}/cxxopts ${CMAKE_CURRENT_BINARY_DIR}/_deps/cxxopts)
+endif()
 
 add_subdirectory(flatb)
 
@@ -138,8 +145,8 @@ target_include_directories(
 
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/glm>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/asio/asio/include>
+        $<BUILD_INTERFACE:${LIB_DIR}/glm>
+        $<BUILD_INTERFACE:${LIB_DIR}/asio/asio/include>
 )
 
 target_link_libraries(
@@ -207,8 +214,8 @@ target_include_directories(
 
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/glm>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/asio/asio/include>
+        $<BUILD_INTERFACE:${LIB_DIR}/glm>
+        $<BUILD_INTERFACE:${LIB_DIR}/asio/asio/include>
 )
 
 target_link_libraries(

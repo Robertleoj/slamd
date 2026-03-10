@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-project(myviz_bindings LANGUAGES CXX)
+project(slamd LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(LIB_DIR vendored_deps)
+set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendored_deps)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BUILD_SHARED_LIBS OFF)
@@ -36,7 +36,7 @@ add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF)
 
 # EXCLUDE_FROM_ALL prevents vendored deps from installing their own
 # files (static archives, examples, tools) into the wheel.
-add_subdirectory(slamd_src EXCLUDE_FROM_ALL)
+add_subdirectory(slamd EXCLUDE_FROM_ALL)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module REQUIRED)
 
@@ -82,7 +82,7 @@ target_link_libraries(bindings
         fmt::fmt
 )
 
-# slamd_window is excluded from ALL due to EXCLUDE_FROM_ALL on slamd_src,
+# slamd_window is excluded from ALL due to EXCLUDE_FROM_ALL on slamd,
 # so we need to make bindings depend on it to ensure it gets built.
 add_dependencies(bindings slamd_window)
 

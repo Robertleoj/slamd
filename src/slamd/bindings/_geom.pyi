@@ -1,7 +1,7 @@
 from __future__ import annotations
 import numpy
 import typing
-__all__ = ['Arrows', 'Box', 'CameraFrustum', 'Circles2D', 'Geometry', 'Image', 'Mesh', 'Plane', 'PointCloud', 'Points2D', 'PolyLine', 'PolyLine2D', 'Sphere', 'Triad']
+__all__: list[str] = ['Arrows', 'Box', 'CameraFrustum', 'Circles2D', 'Geometry', 'Image', 'Mesh', 'Plane', 'PointCloud', 'Points2D', 'PolyLine', 'PolyLine2D', 'Sphere', 'Triad']
 class Arrows(Geometry):
     pass
 class Box(Geometry):

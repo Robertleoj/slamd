@@ -15,16 +15,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Copy stuff
-        run: |
-          rm -rf python_bindings/vendored_deps
-          rm -rf python_bindings/slamd_src
-          rm -rf python_bindings/README.md
-
-          cp -r vendored_deps python_bindings/vendored_deps
-          cp -r slamd python_bindings/slamd_src
-          cp README.md python_bindings/README.md
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -42,18 +32,13 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y epel-release && \
             yum install -y \
-              glfw-devel \
               libX11-devel \
               libXcursor-devel \
               libXrandr-devel \
               libXinerama-devel \
               libXi-devel \
               wayland-devel \
+              libxkbcommon-devel \
               mesa-libEGL-devel \
-              mesa-libGLES-devel \
-              SDL2-devel \
-              qt5-qtbase-devel \
-              gtk3-devel
-        run: |
-          cd python_bindings
-          cibuildwheel --output-dir dist
+              mesa-libGLES-devel
+        run: cibuildwheel --output-dir dist

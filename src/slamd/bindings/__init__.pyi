@@ -7,7 +7,7 @@ import typing
 from . import _geom
 from . import geom
 from . import geom2d
-__all__ = ['Canvas', 'Scene', 'Visualizer', 'geom', 'geom2d', 'spawn_window']
+__all__: list[str] = ['Canvas', 'Scene', 'Visualizer', 'geom', 'geom2d', 'spawn_window']
 class Canvas:
     def __init__(self) -> None:
         ...
