@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_DIR = Path(__file__).parent.resolve()
+REPO_DIR = Path(__file__).parent.parent.resolve()
 
 
 def main():
@@ -17,7 +17,6 @@ def main():
         check=True,
     )
 
-    sys.path.insert(0, str(REPO_DIR / "tools"))
     from build_flatbuffers import compile_flatbuffers
     from embed_shaders import embed_shaders
 
@@ -30,8 +29,13 @@ def main():
     print("\n=== Installing package (editable) ===")
     subprocess.run(
         [
-            "uv", "pip", "install",
-            "--force-reinstall", "--no-build-isolation", "-e", ".",
+            "uv",
+            "pip",
+            "install",
+            "--force-reinstall",
+            "--no-build-isolation",
+            "-e",
+            ".",
         ],
         cwd=REPO_DIR,
         check=True,
@@ -51,10 +55,13 @@ def main():
     print("\n=== Generating type stubs ===")
     subprocess.run(
         [
-            sys.executable, "-m", "pybind11_stubgen",
+            sys.executable,
+            "-m",
+            "pybind11_stubgen",
             "slamd.bindings",
             "--numpy-array-remove-parameters",
-            "-o", "src",
+            "-o",
+            "src",
         ],
         cwd=REPO_DIR,
         check=True,
