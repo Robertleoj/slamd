@@ -42,7 +42,7 @@ def Sphere(radius: typing.SupportsFloat | typing.SupportsIndex = 1.0, color: num
     """
     Create a Sphere geometry
     """
-def Triad(pose: numpy.ndarray[float32[4][4]] | None = None, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, thickness: typing.SupportsFloat | typing.SupportsIndex = 0.10000000149011612) -> slamd.bindings._geom.Triad:
+def Triad(pose: numpy.ndarray | None = None, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, thickness: typing.SupportsFloat | typing.SupportsIndex = 0.10000000149011612) -> slamd.bindings._geom.Triad:
     """
     Create a Triad geometry
     """

@@ -10,7 +10,7 @@ namespace pybind11::detail {
 
 template <>
 struct type_caster<glm::vec2> {
-    PYBIND11_TYPE_CASTER(glm::vec2, _("numpy.ndarray[float32[2]]"));
+    PYBIND11_TYPE_CASTER(glm::vec2, _("numpy.ndarray"));
 
     bool load(
         handle src,
@@ -36,7 +36,7 @@ struct type_caster<glm::vec2> {
 
 template <>
 struct type_caster<glm::vec3> {
-    PYBIND11_TYPE_CASTER(glm::vec3, _("numpy.ndarray[float32[3]]"));
+    PYBIND11_TYPE_CASTER(glm::vec3, _("numpy.ndarray"));
 
     bool load(
         handle src,
@@ -62,7 +62,7 @@ struct type_caster<glm::vec3> {
 
 template <>
 struct type_caster<glm::mat4> {
-    PYBIND11_TYPE_CASTER(glm::mat4, _("numpy.ndarray[float32[4][4]]"));
+    PYBIND11_TYPE_CASTER(glm::mat4, _("numpy.ndarray"));
 
     bool load(
         handle src,
@@ -99,7 +99,7 @@ struct type_caster<glm::mat4> {
 
 template <>
 struct type_caster<glm::mat3> {
-    PYBIND11_TYPE_CASTER(glm::mat3, _("numpy.ndarray[float32[3][3]]"));
+    PYBIND11_TYPE_CASTER(glm::mat3, _("numpy.ndarray"));
 
     bool load(
         handle src,
@@ -139,7 +139,7 @@ template <>
 struct type_caster<std::vector<glm::vec3>> {
     PYBIND11_TYPE_CASTER(
         std::vector<glm::vec3>,
-        _("numpy.ndarray[float32[n][3]]")
+        _("numpy.ndarray")
     );
 
     bool load(
@@ -195,7 +195,7 @@ template <>
 struct type_caster<std::vector<glm::vec2>> {
     PYBIND11_TYPE_CASTER(
         std::vector<glm::vec2>,
-        _("numpy.ndarray[float32[n][2]]")
+        _("numpy.ndarray")
     );
 
     bool load(
@@ -653,7 +653,11 @@ PYBIND11_MODULE(
         )
         .def(
             "set_object",
-            &slamd::Scene::set_object,
+            [](slamd::Scene& self,
+               const std::string& path,
+               std::shared_ptr<slamd::_geom::Geometry> object) {
+                self.set_object(path, object);
+            },
             py::arg("path"),
             py::arg("object")
         )
@@ -672,7 +676,11 @@ PYBIND11_MODULE(
         )
         .def(
             "set_object",
-            &slamd::Canvas::set_object,
+            [](slamd::Canvas& self,
+               const std::string& path,
+               std::shared_ptr<slamd::_geom::Geometry> object) {
+                self.set_object(path, object);
+            },
             py::arg("path"),
             py::arg("object")
         )

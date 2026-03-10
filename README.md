@@ -110,7 +110,7 @@ Or this one:
 
 ## Further reading
 
-The examples in `python_examples` showcase some more features of SlamDunk. Some examples are canvases for 2D visualizations and lots of additional geometry primitives such as point clouds, meshes, camera frustums, etc.
+The examples in `examples` showcase some more features of SlamDunk. Some examples are canvases for 2D visualizations and lots of additional geometry primitives such as point clouds, meshes, camera frustums, etc.
 
 # Installation
 

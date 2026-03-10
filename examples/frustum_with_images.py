@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     frustum = slamd.geom.CameraFrustum(K, width, height, img, 1.0)
 
-    scene.set_object("/rot1/tr/rot2/cam/triad", slamd.geom.Triad(0.5))
+    scene.set_object("/rot1/tr/rot2/cam/triad", slamd.geom.Triad(scale=0.5))
     scene.set_object("/rot1/tr/rot2/cam/frustum", frustum)
 
     rot2 = np.eye(4)
