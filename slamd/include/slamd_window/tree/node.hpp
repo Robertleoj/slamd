@@ -29,8 +29,6 @@ class Node {
 
    public:
     bool checked = true;
-    float last_label_w = 0.0f;
-    bool has_children_cached = false;
     std::optional<bool> glob_matches = std::nullopt;
 
     std::optional<std::shared_ptr<_geom::Geometry>> get_object() const;

@@ -1,6 +1,7 @@
 #pragma once
 #include <flatb/visualizer_generated.h>
 #include <slamd_window/tree/tree.hpp>
+#include <slamd_window/tree_overlay.hpp>
 
 namespace slamd {
 
@@ -17,11 +18,7 @@ class View {
    public:
     bool _dirty = true;
     std::shared_ptr<Tree> tree;
-    std::unordered_map<Node*, bool> tree_open;
-    std::optional<std::string> visualize_glob = std::nullopt;
-    char filter_buf[512] = "";
-    float tree_overlay_w = 0.0f;
-    float tree_overlay_h = 0.0f;
+    TreeOverlay tree_overlay;
 };
 
 }  // namespace slamd

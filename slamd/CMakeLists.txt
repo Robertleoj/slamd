@@ -108,6 +108,7 @@ target_sources(
         src/window/arcball.cpp
         src/window/frame_timer.cpp
         src/window/run_window.cpp
+        src/window/tree_overlay.cpp
         src/window/state_manager.cpp
         src/window/connection.cpp
         src/window/message.cpp
