@@ -1,6 +1,7 @@
 import numpy as np
 from ..bindings.geom import (
     PointCloud as PointCloud_internal,
+    Spheres as Spheres_internal,
     PolyLine as PolyLine_internal,
     Sphere as Sphere_internal,
     Arrows as Arrows_internal,
@@ -100,3 +101,29 @@ def Plane(
 
 def Triad(pose: np.ndarray | None = None, scale: float = 1.0, thickness: float = 1.0):
     return Triad_internal(pose, scale, thickness)
+
+
+def Spheres(
+    positions: np.ndarray,
+    colors: np.ndarray | tuple[int, int, int] = Color.black,
+    radii: np.ndarray | float = 1.0,
+    min_brightness: float = 0.3,
+):
+    """3D spheres with per-point color and radius.
+
+    Args:
+        positions: An N x 3 array of the 3D positions.
+        colors: The color of the spheres. Can be one of:
+            - array of shape N x 3 of RGB colors in (0, 1)
+            - array of shape 3 with a single RGB color in (0, 1)
+            - tuple of an RGB value, 0–255
+        radii: The radius of each sphere. Can be:
+            - array of shape N with a radius per sphere
+            - single float for uniform radius
+        min_brightness: Minimum brightness applied to the spheres.
+    """
+    n = positions.shape[0]
+    colors_np = process_color(colors, n)
+    radii_np = process_radii(radii, n)
+
+    return Spheres_internal(positions, colors_np, radii_np, min_brightness)

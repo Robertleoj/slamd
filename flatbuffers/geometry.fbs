@@ -73,6 +73,13 @@ table Mesh {
     min_brightness: float;
 }
 
+table Spheres {
+    positions: [Vec3];
+    colors: [Vec3];
+    radii: [float];
+    min_brightness: float;
+}
+
 table Plane {
     normal: Vec3;
     point: Vec3;
@@ -94,7 +101,8 @@ union GeometryUnion {
     poly_line: PolyLine,
     poly_line_2d: PolyLine2D,
     mesh: Mesh,
-    plane: Plane
+    plane: Plane,
+    spheres: Spheres
 }
 
 table Geometry {

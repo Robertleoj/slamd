@@ -121,6 +121,10 @@ void run_window(
         ImGui::SaveIniSettingsToDisk(layout_path.string().c_str());
     }
 
+    state_manager.views.clear();
+    state_manager.trees.clear();
+    state_manager.geometries.clear();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

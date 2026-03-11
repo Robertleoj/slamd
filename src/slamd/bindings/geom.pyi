@@ -3,7 +3,7 @@ import collections.abc
 import numpy
 import slamd.bindings._geom
 import typing
-__all__: list[str] = ['Arrows', 'Box', 'CameraFrustum', 'Mesh', 'Plane', 'PointCloud', 'PolyLine', 'Sphere', 'Triad']
+__all__: list[str] = ['Arrows', 'Box', 'CameraFrustum', 'Mesh', 'Plane', 'PointCloud', 'PolyLine', 'Sphere', 'Spheres', 'Triad']
 def Arrows(starts: numpy.ndarray, ends: numpy.ndarray, colors: numpy.ndarray, thickness: typing.SupportsFloat | typing.SupportsIndex) -> slamd.bindings._geom.Arrows:
     """
     Create an Arrows geometry
@@ -41,6 +41,10 @@ def PolyLine(points: numpy.ndarray, thickness: typing.SupportsFloat | typing.Sup
 def Sphere(radius: typing.SupportsFloat | typing.SupportsIndex = 1.0, color: numpy.ndarray = ...) -> slamd.bindings._geom.Sphere:
     """
     Create a Sphere geometry
+    """
+def Spheres(positions: numpy.ndarray, colors: numpy.ndarray, radii: list[float] | numpy.ndarray, min_brightness: typing.SupportsFloat | typing.SupportsIndex = 0.30000001192092896) -> slamd.bindings._geom.Spheres:
+    """
+    Create Spheres with per-point color and radius
     """
 def Triad(pose: numpy.ndarray | None = None, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, thickness: typing.SupportsFloat | typing.SupportsIndex = 0.10000000149011612) -> slamd.bindings._geom.Triad:
     """

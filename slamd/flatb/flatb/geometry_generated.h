@@ -54,6 +54,9 @@ struct PolyLine2DBuilder;
 struct Mesh;
 struct MeshBuilder;
 
+struct Spheres;
+struct SpheresBuilder;
+
 struct Plane;
 struct PlaneBuilder;
 
@@ -75,11 +78,12 @@ enum GeometryUnion : uint8_t {
   GeometryUnion_poly_line_2d = 11,
   GeometryUnion_mesh = 12,
   GeometryUnion_plane = 13,
+  GeometryUnion_spheres = 14,
   GeometryUnion_MIN = GeometryUnion_NONE,
-  GeometryUnion_MAX = GeometryUnion_plane
+  GeometryUnion_MAX = GeometryUnion_spheres
 };
 
-inline const GeometryUnion (&EnumValuesGeometryUnion())[14] {
+inline const GeometryUnion (&EnumValuesGeometryUnion())[15] {
   static const GeometryUnion values[] = {
     GeometryUnion_NONE,
     GeometryUnion_triad,
@@ -94,13 +98,14 @@ inline const GeometryUnion (&EnumValuesGeometryUnion())[14] {
     GeometryUnion_poly_line,
     GeometryUnion_poly_line_2d,
     GeometryUnion_mesh,
-    GeometryUnion_plane
+    GeometryUnion_plane,
+    GeometryUnion_spheres
   };
   return values;
 }
 
 inline const char * const *EnumNamesGeometryUnion() {
-  static const char * const names[15] = {
+  static const char * const names[16] = {
     "NONE",
     "triad",
     "circles_2d",
@@ -115,13 +120,14 @@ inline const char * const *EnumNamesGeometryUnion() {
     "poly_line_2d",
     "mesh",
     "plane",
+    "spheres",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameGeometryUnion(GeometryUnion e) {
-  if (::flatbuffers::IsOutRange(e, GeometryUnion_NONE, GeometryUnion_plane)) return "";
+  if (::flatbuffers::IsOutRange(e, GeometryUnion_NONE, GeometryUnion_spheres)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesGeometryUnion()[index];
 }
@@ -180,6 +186,10 @@ template<> struct GeometryUnionTraits<slamd::flatb::Mesh> {
 
 template<> struct GeometryUnionTraits<slamd::flatb::Plane> {
   static const GeometryUnion enum_value = GeometryUnion_plane;
+};
+
+template<> struct GeometryUnionTraits<slamd::flatb::Spheres> {
+  static const GeometryUnion enum_value = GeometryUnion_spheres;
 };
 
 bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *obj, GeometryUnion type);
@@ -1026,6 +1036,97 @@ inline ::flatbuffers::Offset<Mesh> CreateMesh(
   return builder_.Finish();
 }
 
+struct Spheres FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SpheresBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITIONS = 4,
+    VT_COLORS = 6,
+    VT_RADII = 8,
+    VT_MIN_BRIGHTNESS = 10
+  };
+  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *positions() const {
+    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_POSITIONS);
+  }
+  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *colors() const {
+    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_COLORS);
+  }
+  const ::flatbuffers::Vector<float> *radii() const {
+    return GetPointer<const ::flatbuffers::Vector<float> *>(VT_RADII);
+  }
+  float min_brightness() const {
+    return GetField<float>(VT_MIN_BRIGHTNESS, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_POSITIONS) &&
+           verifier.VerifyVector(positions()) &&
+           VerifyOffset(verifier, VT_COLORS) &&
+           verifier.VerifyVector(colors()) &&
+           VerifyOffset(verifier, VT_RADII) &&
+           verifier.VerifyVector(radii()) &&
+           VerifyField<float>(verifier, VT_MIN_BRIGHTNESS, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct SpheresBuilder {
+  typedef Spheres Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_positions(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> positions) {
+    fbb_.AddOffset(Spheres::VT_POSITIONS, positions);
+  }
+  void add_colors(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors) {
+    fbb_.AddOffset(Spheres::VT_COLORS, colors);
+  }
+  void add_radii(::flatbuffers::Offset<::flatbuffers::Vector<float>> radii) {
+    fbb_.AddOffset(Spheres::VT_RADII, radii);
+  }
+  void add_min_brightness(float min_brightness) {
+    fbb_.AddElement<float>(Spheres::VT_MIN_BRIGHTNESS, min_brightness, 0.0f);
+  }
+  explicit SpheresBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Spheres> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Spheres>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Spheres> CreateSpheres(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> positions = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<float>> radii = 0,
+    float min_brightness = 0.0f) {
+  SpheresBuilder builder_(_fbb);
+  builder_.add_min_brightness(min_brightness);
+  builder_.add_radii(radii);
+  builder_.add_colors(colors);
+  builder_.add_positions(positions);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Spheres> CreateSpheresDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<slamd::flatb::Vec3> *positions = nullptr,
+    const std::vector<slamd::flatb::Vec3> *colors = nullptr,
+    const std::vector<float> *radii = nullptr,
+    float min_brightness = 0.0f) {
+  auto positions__ = positions ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*positions) : 0;
+  auto colors__ = colors ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*colors) : 0;
+  auto radii__ = radii ? _fbb.CreateVector<float>(*radii) : 0;
+  return slamd::flatb::CreateSpheres(
+      _fbb,
+      positions__,
+      colors__,
+      radii__,
+      min_brightness);
+}
+
 struct Plane FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef PlaneBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -1163,6 +1264,9 @@ struct Geometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const slamd::flatb::Plane *geometry_as_plane() const {
     return geometry_type() == slamd::flatb::GeometryUnion_plane ? static_cast<const slamd::flatb::Plane *>(geometry()) : nullptr;
   }
+  const slamd::flatb::Spheres *geometry_as_spheres() const {
+    return geometry_type() == slamd::flatb::GeometryUnion_spheres ? static_cast<const slamd::flatb::Spheres *>(geometry()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_GEOMETRY_ID, 8) &&
@@ -1223,6 +1327,10 @@ template<> inline const slamd::flatb::Mesh *Geometry::geometry_as<slamd::flatb::
 
 template<> inline const slamd::flatb::Plane *Geometry::geometry_as<slamd::flatb::Plane>() const {
   return geometry_as_plane();
+}
+
+template<> inline const slamd::flatb::Spheres *Geometry::geometry_as<slamd::flatb::Spheres>() const {
+  return geometry_as_spheres();
 }
 
 struct GeometryBuilder {
@@ -1316,6 +1424,10 @@ inline bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *o
     }
     case GeometryUnion_plane: {
       auto ptr = reinterpret_cast<const slamd::flatb::Plane *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case GeometryUnion_spheres: {
+      auto ptr = reinterpret_cast<const slamd::flatb::Spheres *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import numpy
 import typing
-__all__: list[str] = ['Arrows', 'Box', 'CameraFrustum', 'Circles2D', 'Geometry', 'Image', 'Mesh', 'Plane', 'PointCloud', 'Points2D', 'PolyLine', 'PolyLine2D', 'Sphere', 'Triad']
+__all__: list[str] = ['Arrows', 'Box', 'CameraFrustum', 'Circles2D', 'Geometry', 'Image', 'Mesh', 'Plane', 'PointCloud', 'Points2D', 'PolyLine', 'PolyLine2D', 'Sphere', 'Spheres', 'Triad']
 class Arrows(Geometry):
     pass
 class Box(Geometry):
@@ -43,5 +43,12 @@ class PolyLine2D(Geometry):
     pass
 class Sphere(Geometry):
     pass
+class Spheres(Geometry):
+    def update_colors(self, colors: numpy.ndarray) -> None:
+        ...
+    def update_positions(self, positions: numpy.ndarray) -> None:
+        ...
+    def update_radii(self, radii: list[float] | numpy.ndarray) -> None:
+        ...
 class Triad(Geometry):
     pass

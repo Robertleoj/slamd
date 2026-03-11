@@ -1,6 +1,7 @@
 #include <slamd/geom/arrows.hpp>
 #include <slamd/geom/box.hpp>
 #include <slamd/geom/camera_frustum.hpp>
+#include <slamd/geom/spheres.hpp>
 #include <slamd/geom/circles_2d.hpp>
 #include <slamd/geom/image.hpp>
 #include <slamd/geom/mesh.hpp>

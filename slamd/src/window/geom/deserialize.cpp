@@ -1,4 +1,5 @@
 #include <slamd_window/geom/arrows.hpp>
+#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/box.hpp>
 #include <slamd_window/geom/camera_frustum.hpp>
 #include <slamd_window/geom/circles_2d.hpp>
@@ -60,6 +61,9 @@ std::shared_ptr<Geometry> Geometry::deserialize(
         }
         case (slamd::flatb::GeometryUnion_plane): {
             return Plane::deserialize(geom_fb->geometry_as_plane());
+        }
+        case (slamd::flatb::GeometryUnion_spheres): {
+            return Spheres::deserialize(geom_fb->geometry_as_spheres());
         }
         default: {
             throw std::runtime_error("Unknown geometry type");

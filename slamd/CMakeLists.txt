@@ -138,6 +138,7 @@ target_sources(
         src/window/geom/poly_line_2d.cpp
         src/window/geom/mono_instanced.cpp
         src/window/geom/circles_2d.cpp
+        src/window/geom/spheres.cpp
         src/window/geom/plane.cpp
 )
 
@@ -208,6 +209,7 @@ target_sources(
         src/slamd/geom/poly_line_2d.cpp
         src/slamd/geom/mono_instanced.cpp
         src/slamd/geom/circles_2d.cpp
+        src/slamd/geom/spheres.cpp
 )
 
 target_include_directories(

@@ -40,6 +40,22 @@ table UpdateCircles2DRadii {
     radii: [float];
 }
 
+// spheres
+table UpdateSpheresPositions {
+    object_id: ulong;
+    positions: [Vec3];
+}
+
+table UpdateSpheresColors {
+    object_id: ulong;
+    colors: [Vec3];
+}
+
+table UpdateSpheresRadii {
+    object_id: ulong;
+    radii: [float];
+}
+
 //point cloud
 table UpdatePointCloudPositions {
     object_id: ulong;
@@ -128,7 +144,12 @@ union MessageUnion {
     // point cloud
     update_point_cloud_positions: UpdatePointCloudPositions,
     update_point_cloud_colors: UpdatePointCloudColors,
-    update_point_cloud_radii: UpdatePointCloudRadii
+    update_point_cloud_radii: UpdatePointCloudRadii,
+
+    // spheres
+    update_spheres_positions: UpdateSpheresPositions,
+    update_spheres_colors: UpdateSpheresColors,
+    update_spheres_radii: UpdateSpheresRadii
 }
 
 table Message {

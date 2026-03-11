@@ -367,6 +367,26 @@ void define_private_geom(
         );
 
     py::class_<
+        slamd::_geom::Spheres,
+        slamd::_geom::Geometry,
+        std::shared_ptr<slamd::_geom::Spheres>>(m, "Spheres")
+        .def(
+            "update_positions",
+            &slamd::_geom::Spheres::update_positions,
+            py::arg("positions")
+        )
+        .def(
+            "update_colors",
+            &slamd::_geom::Spheres::update_colors,
+            py::arg("colors")
+        )
+        .def(
+            "update_radii",
+            &slamd::_geom::Spheres::update_radii,
+            py::arg("radii")
+        );
+
+    py::class_<
         slamd::_geom::Points2D,
         slamd::_geom::Geometry,
         std::shared_ptr<slamd::_geom::Points2D>>(m, "Points2D");
@@ -512,6 +532,26 @@ void define_geom(
         py::arg("radii"),
         py::arg("min_brightness") = 1.0f,
         "Create a PointCloud with per-point color and radius"
+    );
+
+    m.def(
+        "Spheres",
+        [](const std::vector<glm::vec3>& positions,
+           const std::vector<glm::vec3>& colors,
+           const std::vector<float>& radii,
+           float min_brightness) {
+            return slamd::geom::spheres(
+                positions,
+                colors,
+                radii,
+                min_brightness
+            );
+        },
+        py::arg("positions"),
+        py::arg("colors"),
+        py::arg("radii"),
+        py::arg("min_brightness") = 0.3f,
+        "Create Spheres with per-point color and radius"
     );
 
     m.def(

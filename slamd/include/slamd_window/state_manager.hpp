@@ -68,6 +68,16 @@ class StateManager {
         const slamd::flatb::UpdatePointCloudRadii* update_fb
     );
 
+    void handle_update_spheres_positions(
+        const slamd::flatb::UpdateSpheresPositions* update_fb
+    );
+    void handle_update_spheres_colors(
+        const slamd::flatb::UpdateSpheresColors* update_fb
+    );
+    void handle_update_spheres_radii(
+        const slamd::flatb::UpdateSpheresRadii* update_fb
+    );
+
    public:
     std::atomic<bool> loaded = false;
     std::optional<fs::path> layout_path = std::nullopt;
