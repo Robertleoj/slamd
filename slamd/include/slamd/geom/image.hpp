@@ -27,11 +27,4 @@ using ImagePtr = std::shared_ptr<_geom::Image>;
 ImagePtr image(data::Image&& image);
 }  // namespace geom
 
-namespace geom2d {
-using ImagePtr = std::shared_ptr<_geom::Image>;
-
-ImagePtr image(data::Image&& image);
-
-}  // namespace geom2d
-
 }  // namespace slamd

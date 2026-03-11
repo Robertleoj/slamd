@@ -3,6 +3,7 @@
 #include <asio.hpp>
 #include <slamd_common/utils/thread_safe_queue.hpp>
 #include <slamd_window/message.hpp>
+#include <mutex>
 #include <thread>
 
 namespace slamd {
@@ -25,6 +26,9 @@ class Connection {
 
     std::thread job_thread;
     std::atomic<bool> stop_requested = false;
+
+    std::mutex socket_mutex;
+    asio::ip::tcp::socket* active_socket = nullptr;
 };
 
 }  // namespace slamd

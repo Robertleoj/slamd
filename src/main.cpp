@@ -9,32 +9,6 @@ namespace py = pybind11;
 namespace pybind11::detail {
 
 template <>
-struct type_caster<glm::vec2> {
-    PYBIND11_TYPE_CASTER(glm::vec2, _("numpy.ndarray"));
-
-    bool load(
-        handle src,
-        bool
-    ) {
-        auto buf = py::array_t < float,
-             py::array::c_style | py::array::forcecast > ::ensure(src);
-        if (!buf || buf.ndim() != 1 || buf.shape(0) != 2) {
-            return false;
-        }
-        value = glm::vec2(buf.at(0), buf.at(1));
-        return true;
-    }
-
-    static handle cast(
-        const glm::vec2& v,
-        return_value_policy,
-        handle
-    ) {
-        return py::array_t<float>({2}, {sizeof(float)}, &v[0]).release();
-    }
-};
-
-template <>
 struct type_caster<glm::vec3> {
     PYBIND11_TYPE_CASTER(glm::vec3, _("numpy.ndarray"));
 
@@ -190,62 +164,6 @@ struct type_caster<std::vector<glm::vec3>> {
     }
 };
 
-// vector<glm::vec2>
-template <>
-struct type_caster<std::vector<glm::vec2>> {
-    PYBIND11_TYPE_CASTER(
-        std::vector<glm::vec2>,
-        _("numpy.ndarray")
-    );
-
-    bool load(
-        handle src,
-        bool
-    ) {
-        auto buf = py::array_t < float,
-             py::array::c_style | py::array::forcecast > ::ensure(src);
-        if (!buf || buf.ndim() != 2 || buf.shape(1) != 2) {
-            return false;
-        }
-        ssize_t n = buf.shape(0);
-        value.resize(n);
-        for (ssize_t i = 0; i < n; ++i) {
-            value[i] = glm::vec2(buf.at(i, 0), buf.at(i, 1));
-        }
-        return true;
-    }
-
-    static handle cast(
-        const std::vector<glm::vec2>& vecs,
-        return_value_policy,
-        handle
-    ) {
-        std::vector<ssize_t> shape = {static_cast<ssize_t>(vecs.size()), 2};
-        std::vector<ssize_t> strides = {
-            static_cast<ssize_t>(sizeof(float) * 2),
-            static_cast<ssize_t>(sizeof(float))
-        };
-
-        py::array_t<float> arr(py::buffer_info(
-            nullptr,                                 // no data yet
-            sizeof(float),                           // item size
-            py::format_descriptor<float>::format(),  // format string
-            2,                                       // ndim
-            shape,                                   // shape
-            strides                                  // strides
-        ));
-
-        auto r = arr.mutable_unchecked<2>();
-        for (size_t i = 0; i < vecs.size(); ++i) {
-            for (int j = 0; j < 2; ++j) {
-                r(i, j) = vecs[i][j];
-            }
-        }
-
-        return arr.release();
-    }
-};
-
 template <>
 struct type_caster<slamd::data::Image> {
     PYBIND11_TYPE_CASTER(slamd::data::Image, _("numpy.ndarray"));
@@ -387,11 +305,6 @@ void define_private_geom(
         );
 
     py::class_<
-        slamd::_geom::Points2D,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Points2D>>(m, "Points2D");
-
-    py::class_<
         slamd::_geom::PolyLine,
         slamd::_geom::Geometry,
         std::shared_ptr<slamd::_geom::PolyLine>>(m, "PolyLine");
@@ -432,30 +345,6 @@ void define_private_geom(
         slamd::_geom::Geometry,
         std::shared_ptr<slamd::_geom::Image>>(m, "Image");
 
-    py::class_<
-        slamd::_geom::PolyLine2D,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::PolyLine2D>>(m, "PolyLine2D");
-
-    py::class_<
-        slamd::_geom::Circles2D,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Circles2D>>(m, "Circles2D")
-        .def(
-            "update_positions",
-            &slamd::_geom::Circles2D::update_positions,
-            py::arg("positions")
-        )
-        .def(
-            "update_colors",
-            &slamd::_geom::Circles2D::update_colors,
-            py::arg("colors")
-        )
-        .def(
-            "update_radii",
-            &slamd::_geom::Circles2D::update_radii,
-            py::arg("radii")
-        );
 }
 
 void define_geom(
@@ -630,51 +519,6 @@ void define_geom(
     );
 }
 
-void define_geom2d(
-    py::module_& m
-) {
-    m.def(
-        "Points",
-        [](const std::vector<glm::vec2>& positions,
-           const std::vector<glm::vec3>& colors,
-           const std::vector<float>& radii) {
-            return slamd::geom2d::points(positions, colors, radii);
-        },
-        py::arg("positions"),
-        py::arg("colors"),
-        py::arg("radii"),
-        "Create 2D points with per-point color and radius"
-    );
-
-    m.def(
-        "Image",
-        [](slamd::data::Image img) {
-            return slamd::geom2d::image(std::move(img));
-        },
-        py::arg("image"),
-        "Create an Image geometry from a NumPy uint8 array (H, W, C)"
-    );
-
-    m.def(
-        "PolyLine",
-        &slamd::geom2d::poly_line,
-        py::arg("points"),
-        py::arg("color"),
-        py::arg("thickness"),
-        "Create a 2D poly line"
-    );
-
-    m.def(
-        "Circles",
-        &slamd::geom2d::circles,
-        py::arg("positions"),
-        py::arg("colors"),
-        py::arg("radii"),
-        py::arg("thickness") = 0.1,
-        "Create a set of circles"
-    );
-}
-
 PYBIND11_MODULE(
     bindings,
     m
@@ -703,29 +547,6 @@ PYBIND11_MODULE(
         )
         .def("clear", &slamd::Scene::clear, py::arg("path"));
 
-    // Canvas bindings
-    py::class_<slamd::Canvas, std::shared_ptr<slamd::Canvas>>(m, "Canvas")
-        .def(py::init([]() {
-            return slamd::canvas();
-        }))
-        .def(
-            "set_transform",
-            &slamd::Canvas::set_transform,
-            py::arg("path"),
-            py::arg("transform")
-        )
-        .def(
-            "set_object",
-            [](slamd::Canvas& self,
-               const std::string& path,
-               std::shared_ptr<slamd::_geom::Geometry> object) {
-                self.set_object(path, object);
-            },
-            py::arg("path"),
-            py::arg("object")
-        )
-        .def("clear", &slamd::Scene::clear, py::arg("path"));
-
     py::class_<
         slamd::_vis::Visualizer,
         std::shared_ptr<slamd::_vis::Visualizer>>(m, "Visualizer")
@@ -742,16 +563,8 @@ PYBIND11_MODULE(
             py::arg("name"),
             py::arg("scene")
         )
-        .def(
-            "add_canvas",
-            &slamd::_vis::Visualizer::add_canvas,
-            py::arg("name"),
-            py::arg("canvas")
-        )
         .def("scene", &slamd::_vis::Visualizer::scene, py::arg("name"))
-        .def("canvas", &slamd::_vis::Visualizer::canvas, py::arg("name"))
-        .def("delete_scene", &slamd::_vis::Visualizer::delete_scene)
-        .def("delete_canvas", &slamd::_vis::Visualizer::delete_canvas);
+        .def("delete_scene", &slamd::_vis::Visualizer::delete_scene);
 
     m.def(
         "spawn_window",
@@ -766,6 +579,4 @@ PYBIND11_MODULE(
     auto geom = m.def_submodule("geom");
     define_geom(geom);
 
-    auto geom2d = m.def_submodule("geom2d");
-    define_geom2d(geom2d);
 }

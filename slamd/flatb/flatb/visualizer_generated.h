@@ -36,25 +36,22 @@ struct InitialStateBuilder;
 
 enum ViewType : int8_t {
   ViewType_NONE = 0,
-  ViewType_CANVAS = 1,
-  ViewType_SCENE = 2,
+  ViewType_SCENE = 1,
   ViewType_MIN = ViewType_NONE,
   ViewType_MAX = ViewType_SCENE
 };
 
-inline const ViewType (&EnumValuesViewType())[3] {
+inline const ViewType (&EnumValuesViewType())[2] {
   static const ViewType values[] = {
     ViewType_NONE,
-    ViewType_CANVAS,
     ViewType_SCENE
   };
   return values;
 }
 
 inline const char * const *EnumNamesViewType() {
-  static const char * const names[4] = {
+  static const char * const names[3] = {
     "NONE",
-    "CANVAS",
     "SCENE",
     nullptr
   };

@@ -58,7 +58,6 @@ target_sources(
         src/common/utils/mesh.cpp
 
         src/common/gmath/aabb.cpp
-        src/common/gmath/rect2d.cpp
         src/common/gmath/angle.cpp
         src/common/gmath/transforms.cpp
         src/common/gmath/serialization.cpp
@@ -99,7 +98,6 @@ target_sources(
     PRIVATE
         src/window/main.cpp
 
-        src/window/camera_2d.cpp
         src/window/image_texture.cpp
         src/window/glfw.cpp
         src/window/frame_buffer.cpp
@@ -117,11 +115,8 @@ target_sources(
         src/window/tree/node.cpp
         src/window/tree/tree_path.cpp
 
-        src/window/view/view.cpp
         src/window/view/scene_view.cpp
-        src/window/view/canvas_view.cpp
 
-        src/window/geom/points_2d.cpp
         src/window/geom/geometry.cpp
         src/window/geom/deserialize.cpp
         src/window/geom/box.cpp
@@ -135,9 +130,7 @@ target_sources(
         src/window/geom/image.cpp
         src/window/geom/point_cloud.cpp
         src/window/geom/camera_frustum.cpp
-        src/window/geom/poly_line_2d.cpp
         src/window/geom/mono_instanced.cpp
-        src/window/geom/circles_2d.cpp
         src/window/geom/spheres.cpp
         src/window/geom/plane.cpp
 )
@@ -194,7 +187,6 @@ target_sources(
         src/slamd/tree/tree.cpp
         src/slamd/tree/tree_path.cpp
 
-        src/slamd/geom/points_2d.cpp
         src/slamd/geom/geometry.cpp
         src/slamd/geom/box.cpp
         src/slamd/geom/mesh.cpp
@@ -206,9 +198,7 @@ target_sources(
         src/slamd/geom/image.cpp
         src/slamd/geom/point_cloud.cpp
         src/slamd/geom/camera_frustum.cpp
-        src/slamd/geom/poly_line_2d.cpp
         src/slamd/geom/mono_instanced.cpp
-        src/slamd/geom/circles_2d.cpp
         src/slamd/geom/spheres.cpp
 )
 

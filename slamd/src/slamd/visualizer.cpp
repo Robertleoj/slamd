@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 #include <slamd/spawn_window.hpp>
+#include <slamd/tree/tree.hpp>
+#include <slamd/view.hpp>
 #include <slamd/visualizer.hpp>
 
 namespace slamd {
@@ -37,15 +39,14 @@ Visualizer::Visualizer(
 
 void Visualizer::add_view(
     std::string name,
-    std::shared_ptr<_tree::Tree> tree,
-    slamd::flatb::ViewType type
+    std::shared_ptr<Scene> tree
 ) {
     if (this->trees.find(tree->id) == this->trees.end()) {
         this->send_tree(tree);
         this->trees.insert({tree->id, tree});
     }
 
-    auto view = _view::View::create(name, this->shared_from_this(), tree, type);
+    auto view = _view::View::create(name, this->shared_from_this(), tree);
 
     std::optional<std::shared_ptr<_view::View>> to_remove;
     {
@@ -109,12 +110,6 @@ void Visualizer::delete_view(
     this->remove_view_tree(to_delete);
 }
 
-void Visualizer::delete_canvas(
-    std::string name
-) {
-    this->delete_view(name);
-}
-
 void Visualizer::remove_view_tree(
     std::shared_ptr<_view::View> view
 ) {
@@ -166,7 +161,7 @@ void Visualizer::remove_view_tree(
 }
 
 void Visualizer::send_tree(
-    std::shared_ptr<_tree::Tree> tree
+    std::shared_ptr<Scene> tree
 ) {
     // find all current geometries
     std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
@@ -196,15 +191,7 @@ void Visualizer::add_scene(
     std::string name,
     std::shared_ptr<Scene> scene
 ) {
-    this->add_view(name, scene, slamd::flatb::ViewType_SCENE);
-}
-
-std::shared_ptr<Canvas> Visualizer::canvas(
-    std::string name
-) {
-    auto canvas = slamd::canvas();
-    this->add_canvas(name, canvas);
-    return canvas;
+    this->add_view(name, scene);
 }
 
 std::shared_ptr<Scene> Visualizer::scene(
@@ -213,13 +200,6 @@ std::shared_ptr<Scene> Visualizer::scene(
     auto scene = slamd::scene();
     this->add_scene(name, scene);
     return scene;
-}
-
-void Visualizer::add_canvas(
-    std::string name,
-    std::shared_ptr<Canvas> canvas
-) {
-    this->add_view(name, canvas, slamd::flatb::ViewType_CANVAS);
 }
 
 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatb::Geometry>>>

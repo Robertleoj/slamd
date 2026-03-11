@@ -22,8 +22,7 @@ table Tree {
 
 enum ViewType: byte {
     NONE = 0,
-    CANVAS = 1,
-    SCENE = 2
+    SCENE = 1
 }
 
 table View {

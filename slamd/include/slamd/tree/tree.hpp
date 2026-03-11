@@ -6,7 +6,6 @@
 #include <mutex>
 #include <slamd/geom/geometry.hpp>
 #include <slamd/tree/tree_path.hpp>
-#include <slamd/view.hpp>
 #include <slamd_common/id.hpp>
 
 namespace slamd {
@@ -22,14 +21,14 @@ namespace _geom {
 class Geometry;
 }
 
-namespace _tree {
+class Scene;
 
-class Tree;
+namespace _tree {
 
 class Node : public std::enable_shared_from_this<Node> {
    public:
     ~Node();
-    Node(Tree* tree, TreePath path);
+    Node(Scene* scene, TreePath path);
 
     std::optional<glm::mat4> get_transform() const;
 
@@ -69,22 +68,24 @@ class Node : public std::enable_shared_from_this<Node> {
     mutable std::mutex transform_mutex;
     mutable std::mutex object_mutex;
 
-    // we use a raw tree pointer here as the lifetime of the node
-    // is tied to the tree.
-    Tree* tree;
+    Scene* scene;
     const TreePath path;
 };
 
-class Tree {
-   public:
-    Tree();
+}  // namespace _tree
 
-    virtual void set_object(
+class Scene {
+   public:
+    Scene();
+
+    void set_object(
         const std::string& path,
         std::shared_ptr<_geom::Geometry> object
     );
 
-    virtual flatbuffers::Offset<slamd::flatb::Tree> serialize(
+    void set_transform(const std::string& path, const glm::mat4& transform);
+
+    flatbuffers::Offset<slamd::flatb::Tree> serialize(
         flatbuffers::FlatBufferBuilder& builder
     );
 
@@ -101,58 +102,26 @@ class Tree {
     std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>>
     find_visualizers();
 
-   protected:
-    void
-    set_transform_mat4(const std::string& path, const glm::mat4& transform);
-
-    std::shared_ptr<std::vector<uint8_t>> get_clear_path_message(
-        const std::string& path
-    );
-    std::optional<Node*> traverse(const TreePath& path);
-    Node* make_path(TreePath path);
-
    public:
     const _id::TreeID id;
     std::map<_id::ViewID, std::weak_ptr<_view::View>> attached_to;
 
    private:
+    std::shared_ptr<std::vector<uint8_t>> get_clear_path_message(
+        const std::string& path
+    );
+    std::optional<_tree::Node*> traverse(const _tree::TreePath& path);
+    _tree::Node* make_path(_tree::TreePath path);
+
     void add_all_geometries_rec(
-        Node* node,
+        _tree::Node* node,
         std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
     );
 
    private:
-    std::shared_ptr<Node> root;
-};
-
-}  // namespace _tree
-
-/**
- * 3D version
- */
-class Scene : public _tree::Tree {
-   public:
-    void set_transform(const std::string& path, glm::mat4 transform);
+    std::shared_ptr<_tree::Node> root;
 };
 
 std::shared_ptr<Scene> scene();
-
-/**
- * 2D version
- */
-class Canvas : public _tree::Tree {
-   public:
-    void set_transform(const std::string& path, glm::mat3 transform);
-    void set_object(
-        const std::string& path,
-        std::shared_ptr<_geom::Geometry> object
-    ) override;
-
-   private:
-    uint64_t insertion_order_counter;
-    float new_depth();
-};
-
-std::shared_ptr<Canvas> canvas();
 
 }  // namespace slamd

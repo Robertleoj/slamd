@@ -24,22 +24,6 @@ table UpdateMeshNormals {
 }
 
 
-// circles2d
-table UpdateCircles2DPositions {
-    object_id: ulong;
-    positions: [Vec2];
-}
-
-table UpdateCircles2DColors {
-    object_id: ulong;
-    colors: [Vec3];
-}
-
-table UpdateCircles2DRadii {
-    object_id: ulong;
-    radii: [float];
-}
-
 // spheres
 table UpdateSpheresPositions {
     object_id: ulong;
@@ -135,11 +119,6 @@ union MessageUnion {
     update_mesh_positions: UpdateMeshPositions,
     update_mesh_colors: UpdateMeshColors,
     update_mesh_normals: UpdateMeshNormals,
-
-    // circles 2d
-    update_circles2d_positions: UpdateCircles2DPositions,
-    update_circles2d_colors: UpdateCircles2DColors,
-    update_circles2d_radii: UpdateCircles2DRadii,
 
     // point cloud
     update_point_cloud_positions: UpdatePointCloudPositions,

@@ -13,10 +13,14 @@ glm::vec3 make_background_color(
     return glm::vec3(0.1f, 0.1f, 0.1f);
 }
 
+void SceneView::mark_dirty() {
+    this->_dirty = true;
+}
+
 SceneView::SceneView(
     std::shared_ptr<Tree> tree
 )
-    : View(std::move(tree)),
+    : tree(std::move(tree)),
       frame_buffer(500, 500),
       camera(45.0, 0.001, 100.0),
       xy_grid(1000.0) {

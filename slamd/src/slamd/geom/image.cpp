@@ -40,17 +40,4 @@ ImagePtr image(
 }
 }  // namespace geom
 
-namespace geom2d {
-
-ImagePtr image(
-    data::Image&& image
-) {
-    auto img = std::make_shared<_geom::Image>(std::move(image), false);
-
-    // _global::geometries.add(img->id, img);
-    return img;
-}
-
-}  // namespace geom2d
-
 }  // namespace slamd

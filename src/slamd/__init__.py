@@ -4,15 +4,13 @@ import socket
 import threading
 import subprocess
 from sys import argv
-from . import geom, geom2d
+from . import geom
 
 
 from .bindings import (
     __doc__,
     Visualizer as Visualizer_internal,
-    Canvas,
     Scene,
-    # geom,
     spawn_window as spawn_window_internal,
 )
 
@@ -72,26 +70,6 @@ class Visualizer:
         """
         return self._impl.add_scene(name, scene)
 
-    def add_canvas(self, name: str, canvas: Canvas) -> None:
-        """Add a named 2D canvas to the visualizer.
-
-        Args:
-            name: Name of the canvas.
-            canvas: The Canvas object to add.
-        """
-        return self._impl.add_canvas(name, canvas)
-
-    def canvas(self, name: str) -> Canvas:
-        """Create and add a new 2D canvas to the visualizer.
-
-        Args:
-            name: Name of the canvas.
-
-        Returns:
-            The newly created Canvas object.
-        """
-        return self._impl.canvas(name)
-
     def scene(self, name: str) -> Scene:
         """Create and add a new 3D scene to the visualizer.
 
@@ -110,14 +88,6 @@ class Visualizer:
             name: Name of the scene to delete.
         """
         self._impl.delete_scene(name)
-
-    def delete_canvas(self, name: str) -> None:
-        """Delete a canvas by name
-
-        Args:
-            name: Name of the canvas to delete.
-        """
-        self._impl.delete_canvas(name)
 
 
 def spawn_window(port: int = 5555) -> None:
@@ -146,10 +116,8 @@ def _window_cli():
 __all__ = [
     "__doc__",
     "Visualizer",
-    "Canvas",
     "Scene",
     "geom",
-    "geom2d",
     "spawn_window",
     "_window_cli",
 ]

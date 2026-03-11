@@ -3,8 +3,8 @@
 #include <flatb/messages_generated.h>
 #include <memory>
 #include <slamd/tree/tree.hpp>
+#include <slamd/view.hpp>
 #include <slamd_common/gmath/serialization.hpp>
-#include <slamd_common/gmath/transforms.hpp>
 #include <slamd_common/utils/serialization.hpp>
 #include <vector>
 
@@ -13,10 +13,10 @@ namespace slamd {
 namespace _tree {
 
 Node::Node(
-    Tree* tree,
+    Scene* scene,
     TreePath path
 )
-    : tree(tree),
+    : scene(scene),
       path(path) {}
 
 Node::~Node() {
@@ -57,7 +57,7 @@ void Node::set_object(
     auto path_fb = builder.CreateString(this->path.string());
     auto set_object_fb = flatb::CreateSetObject(
         builder,
-        this->tree->id.value,
+        this->scene->id.value,
         path_fb,
         object->id.value
     );
@@ -70,144 +70,34 @@ void Node::set_object(
     this->broadcast(_utils::builder_buffer(builder));
 }
 
-void Tree::clear(
-    const std::string& path
+void Node::set_transform(
+    glm::mat4 transform
 ) {
-    TreePath tree_path(path);
+    std::scoped_lock l(this->transform_mutex);
+    this->transform = transform;
 
-    auto current_node = this->root.get();
-
-    for (size_t i = 0; i < tree_path.components.size(); i++) {
-        auto& component = tree_path.components[i];
-
-        if (i == tree_path.components.size() - 1) {
-            // we are at the parent - we delete now
-            current_node->children.erase(component);
-            break;
-        }
-        auto it = current_node->children.find(component);
-        if (it == current_node->children.end()) {
-            // nothing to do
-            return;
-        }
-
-        current_node = it->second.get();
-    }
-
-    if (tree_path.is_root()) {
-        // special case - we want to unhook all children from the root
-        this->root->children.clear();
-    }
-
-    this->broadcast(this->get_clear_path_message(path));
-}
-
-std::shared_ptr<std::vector<uint8_t>> Tree::get_clear_path_message(
-    const std::string& path
-) {
     flatbuffers::FlatBufferBuilder builder;
 
-    auto path_fb = builder.CreateString(path);
+    auto path_fb = builder.CreateString(this->path.string());
+    auto transform_fb = gmath::serialize(transform);
 
-    auto clear_path_fb =
-        flatb::CreateClearPath(builder, this->id.value, path_fb);
+    auto set_transform_fb = flatb::CreateSetTransform(
+        builder,
+        this->scene->id.value,
+        path_fb,
+        &transform_fb
+    );
 
     auto message_fb = flatb::CreateMessage(
         builder,
-        flatb::MessageUnion_clear_path,
-        clear_path_fb.Union()
+        flatb::MessageUnion_set_transform,
+        set_transform_fb.Union()
     );
 
     builder.Finish(message_fb);
 
-    return _utils::builder_buffer(builder);
-}
-
-std::shared_ptr<std::vector<uint8_t>> Tree::get_add_tree_message() {
-    flatbuffers::FlatBufferBuilder builder;
-
-    auto tree_fb = this->serialize(builder);
-
-    auto add_tree_fb = flatb::CreateAddTree(builder, tree_fb);
-
-    auto message_fb = flatb::CreateMessage(
-        builder,
-        flatb::MessageUnion_add_tree,
-        add_tree_fb.Union()
-    );
-
-    builder.Finish(message_fb);
-
-    return _utils::builder_buffer(builder);
-}
-
-std::shared_ptr<std::vector<uint8_t>> Tree::get_remove_tree_message() {
-    flatbuffers::FlatBufferBuilder builder;
-
-    auto remove_tree_fb = flatb::CreateRemoveTree(builder, this->id.value);
-
-    auto message_fb = flatb::CreateMessage(
-        builder,
-        flatb::MessageUnion_remove_tree,
-        remove_tree_fb.Union()
-    );
-
-    builder.Finish(message_fb);
-
-    return _utils::builder_buffer(builder);
-}
-
-void Tree::add_all_geometries_rec(
-    Node* node,
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
-) {
-    for (auto& [_, child] : node->children) {
-        this->add_all_geometries_rec(child.get(), initial_map);
-    }
-
-    auto geom_opt = node->get_object();
-
-    if (!geom_opt.has_value()) {
-        return;
-    }
-
-    auto geom = geom_opt.value();
-
-    auto it = initial_map.find(geom->id);
-
-    if (it != initial_map.end()) {
-        return;
-    }
-
-    initial_map.insert({geom->id, geom});
-}
-
-std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>>
-Node::find_visualizers() {
-    return this->tree->find_visualizers();
-}
-
-std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>>
-Tree::find_visualizers() {
-    std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>> map;
-
-    for (auto it = this->attached_to.begin(); it != this->attached_to.end();) {
-        if (auto view = it->second.lock()) {
-            auto view_vis_map = view->find_visualizers();
-            map.insert(view_vis_map.begin(), view_vis_map.end());
-            it++;
-        } else {
-            it = attached_to.erase(it);
-        }
-    }
-
-    return map;
-}
-
-void Tree::add_all_geometries(
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
-) {
-    this->add_all_geometries_rec(this->root.get(), initial_map);
+    auto message_buffer = _utils::builder_buffer(builder);
+    this->broadcast(message_buffer);
 }
 
 flatbuffers::Offset<slamd::flatb::Node> Node::serialize(
@@ -253,49 +143,160 @@ flatbuffers::Offset<slamd::flatb::Node> Node::serialize(
     return node_builder.Finish();
 }
 
-void Node::set_transform(
-    glm::mat4 transform
+void Node::broadcast(
+    std::shared_ptr<std::vector<uint8_t>> message_buffer
 ) {
-    std::scoped_lock l(this->transform_mutex);
-    this->transform = transform;
+    this->scene->broadcast(message_buffer);
+}
 
+std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>>
+Node::find_visualizers() {
+    return this->scene->find_visualizers();
+}
+
+}  // namespace _tree
+
+Scene::Scene()
+    : id(_id::TreeID::next()) {
+    this->root = std::make_shared<_tree::Node>(this, _tree::TreePath());
+}
+
+void Scene::clear(
+    const std::string& path
+) {
+    _tree::TreePath tree_path(path);
+
+    auto current_node = this->root.get();
+
+    for (size_t i = 0; i < tree_path.components.size(); i++) {
+        auto& component = tree_path.components[i];
+
+        if (i == tree_path.components.size() - 1) {
+            // we are at the parent - we delete now
+            current_node->children.erase(component);
+            break;
+        }
+        auto it = current_node->children.find(component);
+        if (it == current_node->children.end()) {
+            // nothing to do
+            return;
+        }
+
+        current_node = it->second.get();
+    }
+
+    if (tree_path.is_root()) {
+        // special case - we want to unhook all children from the root
+        this->root->children.clear();
+    }
+
+    this->broadcast(this->get_clear_path_message(path));
+}
+
+std::shared_ptr<std::vector<uint8_t>> Scene::get_clear_path_message(
+    const std::string& path
+) {
     flatbuffers::FlatBufferBuilder builder;
 
-    auto path_fb = builder.CreateString(this->path.string());
-    auto transform_fb = gmath::serialize(transform);
-    ;
+    auto path_fb = builder.CreateString(path);
 
-    auto set_transform_fb = flatb::CreateSetTransform(
-        builder,
-        this->tree->id.value,
-        path_fb,
-        &transform_fb
-    );
+    auto clear_path_fb =
+        flatb::CreateClearPath(builder, this->id.value, path_fb);
 
     auto message_fb = flatb::CreateMessage(
         builder,
-        flatb::MessageUnion_set_transform,
-        set_transform_fb.Union()
+        flatb::MessageUnion_clear_path,
+        clear_path_fb.Union()
     );
 
     builder.Finish(message_fb);
 
-    auto message_buffer = _utils::builder_buffer(builder);
-    this->broadcast(message_buffer);
+    return _utils::builder_buffer(builder);
 }
 
-void Node::broadcast(
-    std::shared_ptr<std::vector<uint8_t>> message_buffer
+std::shared_ptr<std::vector<uint8_t>> Scene::get_add_tree_message() {
+    flatbuffers::FlatBufferBuilder builder;
+
+    auto tree_fb = this->serialize(builder);
+
+    auto add_tree_fb = flatb::CreateAddTree(builder, tree_fb);
+
+    auto message_fb = flatb::CreateMessage(
+        builder,
+        flatb::MessageUnion_add_tree,
+        add_tree_fb.Union()
+    );
+
+    builder.Finish(message_fb);
+
+    return _utils::builder_buffer(builder);
+}
+
+std::shared_ptr<std::vector<uint8_t>> Scene::get_remove_tree_message() {
+    flatbuffers::FlatBufferBuilder builder;
+
+    auto remove_tree_fb = flatb::CreateRemoveTree(builder, this->id.value);
+
+    auto message_fb = flatb::CreateMessage(
+        builder,
+        flatb::MessageUnion_remove_tree,
+        remove_tree_fb.Union()
+    );
+
+    builder.Finish(message_fb);
+
+    return _utils::builder_buffer(builder);
+}
+
+void Scene::add_all_geometries_rec(
+    _tree::Node* node,
+    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
 ) {
-    this->tree->broadcast(message_buffer);
+    for (auto& [_, child] : node->children) {
+        this->add_all_geometries_rec(child.get(), initial_map);
+    }
+
+    auto geom_opt = node->get_object();
+
+    if (!geom_opt.has_value()) {
+        return;
+    }
+
+    auto geom = geom_opt.value();
+
+    auto it = initial_map.find(geom->id);
+
+    if (it != initial_map.end()) {
+        return;
+    }
+
+    initial_map.insert({geom->id, geom});
 }
 
-Tree::Tree()
-    : id(_id::TreeID::next()) {
-    this->root = std::make_shared<Node>(this, TreePath());
+std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>>
+Scene::find_visualizers() {
+    std::map<_id::VisualizerID, std::shared_ptr<_vis::Visualizer>> map;
+
+    for (auto it = this->attached_to.begin(); it != this->attached_to.end();) {
+        if (auto view = it->second.lock()) {
+            auto view_vis_map = view->find_visualizers();
+            map.insert(view_vis_map.begin(), view_vis_map.end());
+            it++;
+        } else {
+            it = attached_to.erase(it);
+        }
+    }
+
+    return map;
 }
 
-void Tree::broadcast(
+void Scene::add_all_geometries(
+    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
+) {
+    this->add_all_geometries_rec(this->root.get(), initial_map);
+}
+
+void Scene::broadcast(
     std::shared_ptr<std::vector<uint8_t>> message_buffer
 ) {
     for (auto it = this->attached_to.begin(); it != this->attached_to.end();) {
@@ -308,44 +309,44 @@ void Tree::broadcast(
     }
 }
 
-void Tree::set_object(
+void Scene::set_object(
     const std::string& path,
     std::shared_ptr<_geom::Geometry> object
 ) {
-    TreePath treepath(path);
+    _tree::TreePath treepath(path);
 
     if (treepath.is_root()) {
         throw std::runtime_error("Setting root object is not allowed");
     }
 
-    Node* node = this->make_path(treepath);
+    _tree::Node* node = this->make_path(treepath);
     node->set_object(object);
 }
 
-flatbuffers::Offset<slamd::flatb::Tree> Tree::serialize(
+flatbuffers::Offset<slamd::flatb::Tree> Scene::serialize(
     flatbuffers::FlatBufferBuilder& builder
 ) {
     auto serialized_root = this->root->serialize(builder);
     return slamd::flatb::CreateTree(builder, this->id.value, serialized_root);
 }
 
-void Tree::set_transform_mat4(
+void Scene::set_transform(
     const std::string& path,
     const glm::mat4& transform
 ) {
-    TreePath treepath(path);
+    _tree::TreePath treepath(path);
     if (treepath.is_root()) {
         throw std::runtime_error("Setting root transform is not allowed");
     }
 
-    Node* node = this->make_path(treepath);
+    _tree::Node* node = this->make_path(treepath);
     node->set_transform(transform);
 }
 
-std::optional<Node*> Tree::traverse(
-    const TreePath& path
+std::optional<_tree::Node*> Scene::traverse(
+    const _tree::TreePath& path
 ) {
-    Node* current_node = root.get();
+    _tree::Node* current_node = root.get();
 
     for (size_t i = 0; i < path.components.size(); i++) {
         auto& component = path.components[i];
@@ -362,15 +363,15 @@ std::optional<Node*> Tree::traverse(
     return current_node;
 }
 
-Node* Tree::make_path(
-    TreePath path
+_tree::Node* Scene::make_path(
+    _tree::TreePath path
 ) {
     if (path.components.size() == 0) {
         return this->root.get();
     }
 
-    Node* current_node = root.get();
-    TreePath curr_path;
+    _tree::Node* current_node = root.get();
+    _tree::TreePath curr_path;
 
     for (size_t i = 0; i < path.components.size(); i++) {
         auto& component = path.components[i];
@@ -382,9 +383,9 @@ Node* Tree::make_path(
             // in this case, we want to create the path down to the target
             // node
 
-            auto new_node = std::make_shared<Node>(this, curr_path);
+            auto new_node = std::make_shared<_tree::Node>(this, curr_path);
 
-            Node* new_node_ptr = new_node.get();
+            _tree::Node* new_node_ptr = new_node.get();
 
             // insert the new child
             current_node->children.emplace(component, std::move(new_node));
@@ -400,65 +401,9 @@ Node* Tree::make_path(
     return current_node;
 }
 
-}  // namespace _tree
-
-void Scene::set_transform(
-    const std::string& path,
-    glm::mat4 transform
-) {
-    this->set_transform_mat4(path, transform);
-}
-
 std::shared_ptr<Scene> scene() {
     auto scene = std::make_shared<Scene>();
-    // _global::trees.add(scene->id, scene);
     return scene;
-}
-
-void Canvas::set_transform(
-    const std::string& path,
-    glm::mat3 transform
-) {
-    auto new_transform = gmath::xy_to_3d(transform);
-    auto node = this->make_path(path);
-
-    auto node_transform = node->get_transform().value_or(glm::mat4(1.0));
-
-    new_transform[3][2] = node_transform[3][2];
-
-    node->set_transform(new_transform);
-}
-
-void Canvas::set_object(
-    const std::string& path,
-    std::shared_ptr<_geom::Geometry> object
-) {
-    auto node = this->make_path(path);
-
-    bool is_first_insert = !node->get_object().has_value();
-
-    node->set_object(object);
-
-    if (is_first_insert) {
-        auto node_transform = node->get_transform().value_or(glm::mat4(1.0));
-
-        node_transform[3][2] = this->new_depth();
-
-        node->set_transform(node_transform);
-    }
-}
-
-float Canvas::new_depth() {
-    float new_depth =
-        static_cast<float>(this->insertion_order_counter) / 100.0f;
-    this->insertion_order_counter += 1;
-    return new_depth;
-}
-
-std::shared_ptr<Canvas> canvas() {
-    auto canvas = std::make_shared<Canvas>();
-    // _global::trees.add(canvas->id, canvas);
-    return canvas;
 }
 
 }  // namespace slamd

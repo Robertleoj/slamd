@@ -1,5 +1,7 @@
 #include <flatb/messages_generated.h>
+#include <slamd/tree/tree.hpp>
 #include <slamd/view.hpp>
+#include <slamd/visualizer.hpp>
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {
@@ -8,10 +10,9 @@ namespace _view {
 std::shared_ptr<View> View::create(
     std::string name,
     std::shared_ptr<_vis::Visualizer> vis,
-    std::shared_ptr<_tree::Tree> tree,
-    slamd::flatb::ViewType view_type
+    std::shared_ptr<Scene> tree
 ) {
-    auto view = std::shared_ptr<View>(new View(name, vis, tree, view_type));
+    auto view = std::shared_ptr<View>(new View(name, vis, tree));
     tree->attached_to.insert({view->id, view->shared_from_this()});
 
     return view;
@@ -46,7 +47,7 @@ flatbuffers::Offset<flatb::View> View::serialize(
         builder,
         view_name_flatb,
         this->tree->id.value,
-        this->view_type
+        slamd::flatb::ViewType_SCENE
     );
     return view_fb;
 }
@@ -85,11 +86,9 @@ std::shared_ptr<std::vector<uint8_t>> View::get_remove_view_message() {
 View::View(
     std::string name,
     std::shared_ptr<_vis::Visualizer> vis,
-    std::shared_ptr<_tree::Tree> tree,
-    slamd::flatb::ViewType view_type
+    std::shared_ptr<Scene> tree
 )
     : tree(tree),
-      view_type(view_type),
       vis(vis),
       name(name) {}
 

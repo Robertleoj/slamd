@@ -55,19 +55,6 @@ glm::mat4 tz3D(
     return t3D(glm::vec3(0.0f, 0.0f, amount));
 }
 
-glm::mat4 xy_to_3d(
-    const glm::mat3& mat2d
-) {
-    glm::mat4 mat3d(1.0f);  // identity mat4
-    mat3d[0][0] = mat2d[0][0];
-    mat3d[0][1] = mat2d[0][1];
-    mat3d[1][0] = mat2d[1][0];
-    mat3d[1][1] = mat2d[1][1];
-    mat3d[3][0] = mat2d[2][0];
-    mat3d[3][1] = mat2d[2][1];
-    return mat3d;
-}
-
 glm::mat4 scale_xy(
     const glm::vec2& scale_vec
 ) {

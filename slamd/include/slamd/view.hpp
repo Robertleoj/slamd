@@ -1,9 +1,9 @@
 #pragma once
 #include <flatb/visualizer_generated.h>
+#include <map>
 #include <memory>
-#include <slamd/tree/tree.hpp>
-#include <slamd/visualizer.hpp>
 #include <slamd_common/id.hpp>
+#include <vector>
 
 namespace slamd {
 
@@ -11,9 +11,7 @@ namespace _vis {
 class Visualizer;
 }
 
-namespace _tree {
-class Tree;
-}
+class Scene;
 
 namespace _view {
 class View : public std::enable_shared_from_this<View> {
@@ -21,8 +19,7 @@ class View : public std::enable_shared_from_this<View> {
     static std::shared_ptr<View> create(
         std::string name,
         std::shared_ptr<_vis::Visualizer> vis,
-        std::shared_ptr<_tree::Tree> tree,
-        slamd::flatb::ViewType view_type
+        std::shared_ptr<Scene> tree
     );
     ~View();
 
@@ -41,13 +38,11 @@ class View : public std::enable_shared_from_this<View> {
     View(
         std::string name,
         std::shared_ptr<_vis::Visualizer> vis,
-        std::shared_ptr<_tree::Tree> tree,
-        slamd::flatb::ViewType view_type
+        std::shared_ptr<Scene> tree
     );
 
    public:
-    const std::shared_ptr<_tree::Tree> tree;
-    slamd::flatb::ViewType view_type;
+    const std::shared_ptr<Scene> tree;
 
     // a view is contained in the visualizer, so the lifetime is bound to it
     std::weak_ptr<_vis::Visualizer> vis;

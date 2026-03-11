@@ -1,4 +1,5 @@
 #include <flatb/messages_generated.h>
+#include <fmt/format.h>
 #include <slamd/geom/point_cloud.hpp>
 #include <slamd_common/gmath/serialization.hpp>
 #include <slamd_common/utils/serialization.hpp>

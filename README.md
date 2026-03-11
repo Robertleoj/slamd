@@ -2,15 +2,24 @@
 
 ---
 
-SlamDunk is a powerful and user-friendly Python library for making 3D and 2D visualizations for prototyping, data exploration, and algorithm development.
+![](./images/moving_mesh.gif) ![](./images/spiral.gif)
 
-It is lightweight, built using OpenGL and ImGui.
+SlamDunk is a lightweight Python library for real-time 3D and 2D visualization, built on OpenGL and ImGui. `pip install`, write a few lines of Python, and you've got an interactive 3D viewer.
 
-# Examples
+```bash
+pip install slamd
+```
 
-## Hello world
+**Why SlamDunk?**
 
-Here is a simple "hello world" program for a SlamDunk visualization.
+- **Simple** — a few lines of Python gets you an interactive 3D viewer
+- **Real-time** — update geometry on the fly from your script
+- **Multi-window** — ImGui-powered docking, floating, and tabbed sub-windows
+- **Lightweight** — no heavy frameworks, just OpenGL under the hood
+- **Remote-capable** — optionally connect to a visualizer running on a remote machine
+- **Batteries included** — point clouds, meshes, camera frustums, 2D canvases, and more
+
+# Quick Start
 
 ```python
 import slamd
@@ -24,29 +33,11 @@ scene.set_object("/origin", slamd.geom.Triad())
 vis.hang_forever()
 ```
 
-Running this program results in the following interactive visualization:
 ![](./images/hello_world.png)
 
-This example highlights the main components of SlamDunk.
+# Multiple Scenes
 
-The `Visualizer` object maintains the state of the visualization, and starts a TCP server that the visualization window connects to.
-
-By default, it spawns a window process that reads from it and displays the visualizations. You can opt out of this with the `spawn` argument, and control the port with the `port` argument.
-In this case, you can start a window with the `slamd-window` executable:
-
-```
-slamd-window --port [port] --ip [ip]
-```
-
-This client-server architecture allows launching a visualizer a remote server, and connecting to it on your local machine.
-
-A `Scene` object represents and contains a tree of 3D objects, accessed by paths like `/comp1/comp2/comp3`. 3D poses and `Geometry` objects can be assigned with the `set_transform` and `set_object` methods.
-
-`Geometry` objects represent the objects that are displayed in the scene.
-
-## Multiple scenes
-
-SlamDunk uses ImGui to allow multiple sub-windows with floating and docking support inside the SlamDunk viewer. The following example illustrates creating two windows, each showing its own scene.
+SlamDunk supports multiple sub-windows with ImGui docking. Each window can show its own scene.
 
 ```python
 import slamd
@@ -71,52 +62,58 @@ scene2.set_transform("/ball", sphere_transform)
 vis.hang_forever()
 ```
 
-The resulting window looks like this:
-
 ![](./images/two_scenes.png)
 
-The windows are fully controllable - you can drag them around, make tabs, use them in floating mode, or dock them to the sides like you see in the screenshot. All of this is supported by [ImGui](https://github.com/ocornut/imgui).
+Windows are fully controllable — drag them around, make tabs, float them, or dock them to the sides.
 
-Here is a slightly more elaborate example of something you can do with SlamDunk:
+# Remote Visualization
 
-![](./images/moving_mesh.gif)
+By default, everything runs locally and you don't need to think about networking. But if you're working on a remote server (e.g. a GPU box), you can run the viewer separately on your local machine:
 
-Or this one:
+```bash
+slamd-window --port [port] --ip [ip]
+```
 
-![](./images/spiral.gif)
+Just pass `spawn=False` and `port=...` to `Visualizer` on the remote side.
 
-## Supported geometry primitives
+# Supported Geometry
 
 ### 3D
 
-- Camera Frustums (with optional image) (`slamd.geom.CameraFrustum`)
-- Arrows/Vectors (`slamd.geom.Arrows`)
-- Arbitrary meshes (`slamd.geom.Mesh`)
-- Planes (`slamd.geom.Plane`)
-- Point Clouds (`slamd.geom.PointCloud`)
-- Piecewise linear curves (`slamd.geom.PolyLine`)
-- Spheres (`slamd.geom.Sphere`)
-- Triads/reference frames (`slamd.geom.Triad`)
+- Camera Frustums (with optional image) — `slamd.geom.CameraFrustum`
+- Arrows/Vectors — `slamd.geom.Arrows`
+- Arbitrary meshes — `slamd.geom.Mesh`
+- Planes — `slamd.geom.Plane`
+- Point Clouds — `slamd.geom.PointCloud`
+- Piecewise linear curves — `slamd.geom.PolyLine`
+- Spheres — `slamd.geom.Sphere`
+- Triads/reference frames — `slamd.geom.Triad`
 
-## 2D
+### 2D
 
-- Images (`slamd.geom2d.Image`)
-- Points (`slamd.geom2d.Points`)
-- Piecewise linear curves (`slamd.geom2d.PolyLine`)
-- Circles (`slamd.geom2d.Circles`)
-
-## Further reading
-
-The examples in `examples` showcase some more features of SlamDunk. Some examples are canvases for 2D visualizations and lots of additional geometry primitives such as point clouds, meshes, camera frustums, etc.
+- Images — `slamd.geom2d.Image`
+- Points — `slamd.geom2d.Points`
+- Piecewise linear curves — `slamd.geom2d.PolyLine`
+- Circles — `slamd.geom2d.Circles`
 
 # Installation
 
-Wheels are available on [PyPi](https://pypi.org/project/slamd/), so you can simply
+Wheels are available on [PyPi](https://pypi.org/project/slamd/) for Linux and macOS (Python >= 3.11):
 
 ```bash
 pip install slamd
 ```
 
+The only runtime dependency is `numpy >= 1.23`.
+
+# Examples
+
+The [examples](./examples) directory has scripts demonstrating point clouds, meshes, camera frustums, 2D canvases, animations, and more.
+
 # Contributions
 
-All contributions and feedback are welcome and appreciated!
+All contributions and feedback are welcome! See the [examples](./examples) to get a feel for the API, or open an issue if something's unclear.
+
+# License
+
+Apache 2.0 — see [LICENSE](./LICENSE).

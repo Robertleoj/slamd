@@ -1,5 +1,6 @@
 #include <flatb/messages_generated.h>
 #include <slamd/geom/geometry.hpp>
+#include <slamd/visualizer.hpp>
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {

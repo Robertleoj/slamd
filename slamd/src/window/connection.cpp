@@ -18,6 +18,15 @@ Connection::Connection(
 
 Connection::~Connection() {
     this->stop_requested = true;
+
+    {
+        std::lock_guard<std::mutex> lock(this->socket_mutex);
+        if (this->active_socket) {
+            std::error_code ec;
+            this->active_socket->close(ec);
+        }
+    }
+
     if (this->job_thread.joinable()) {
         this->job_thread.join();
     }
@@ -65,6 +74,11 @@ void Connection::job() {
 
         auto& socket = socket_opt.value();
 
+        {
+            std::lock_guard<std::mutex> lock(this->socket_mutex);
+            this->active_socket = &socket;
+        }
+
         try {
             uint32_t len_net;
             asio::read(
@@ -86,6 +100,10 @@ void Connection::job() {
 
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Error while reading from socket: {}", e.what());
+            {
+                std::lock_guard<std::mutex> lock(this->socket_mutex);
+                this->active_socket = nullptr;
+            }
             connected = false;
             socket.close();
             SPDLOG_INFO("Socket closed due to error.");

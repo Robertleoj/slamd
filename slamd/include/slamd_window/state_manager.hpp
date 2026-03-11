@@ -7,7 +7,7 @@
 #include <slamd_common/id.hpp>
 #include <slamd_window/connection.hpp>
 #include <slamd_window/tree/tree.hpp>
-#include <slamd_window/view/view.hpp>
+#include <slamd_window/view/scene_view.hpp>
 #include <string>
 
 namespace slamd {
@@ -48,16 +48,6 @@ class StateManager {
         const slamd::flatb::UpdateMeshNormals* update_mesh_normals_fb
     );
 
-    void handle_update_circles2d_positions(
-        const slamd::flatb::UpdateCircles2DPositions* update_fb
-    );
-    void handle_update_circles2d_colors(
-        const slamd::flatb::UpdateCircles2DColors* update_fb
-    );
-    void handle_update_circles2d_radii(
-        const slamd::flatb::UpdateCircles2DRadii* update_fb
-    );
-
     void handle_update_point_cloud_positions(
         const slamd::flatb::UpdatePointCloudPositions* update_fb
     );
@@ -82,7 +72,7 @@ class StateManager {
     std::atomic<bool> loaded = false;
     std::optional<fs::path> layout_path = std::nullopt;
 
-    std::map<std::string, std::unique_ptr<View>> views;
+    std::map<std::string, std::unique_ptr<SceneView>> views;
     std::map<_id::TreeID, std::shared_ptr<Tree>> trees;
     std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> geometries;
 
