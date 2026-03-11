@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+import socket
 import threading
 import subprocess
 from sys import argv
@@ -14,6 +15,20 @@ from .bindings import (
     # geom,
     spawn_window as spawn_window_internal,
 )
+
+
+def _check_port_available(port: int) -> None:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.bind(("", port))
+    except OSError:
+        raise OSError(
+            f"Port {port} is already in use. "
+            f"Is another visualizer or process using this port? "
+            f"Try a different port or stop the other process."
+        ) from None
+    finally:
+        sock.close()
 
 
 def _executable_path():
@@ -38,6 +53,7 @@ class Visualizer:
     """
 
     def __init__(self, name: str, spawn=True, port: int = 5555) -> None:
+        _check_port_available(port)
         self._impl = Visualizer_internal(name, port)
 
         if spawn:

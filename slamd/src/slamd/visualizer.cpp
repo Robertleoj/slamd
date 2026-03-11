@@ -15,6 +15,21 @@ Visualizer::Visualizer(
 )
     : port(port),
       name(name) {
+    // Pre-flight check: ensure port is available before starting server thread
+    try {
+        asio::io_context test_io;
+        asio::ip::tcp::acceptor test_acceptor(
+            test_io,
+            asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)
+        );
+    } catch (const asio::system_error&) {
+        throw std::runtime_error(
+            "Port " + std::to_string(port) + " is already in use. "
+            "Is another visualizer or process using this port? "
+            "Try a different port or stop the other process."
+        );
+    }
+
     this->client_set = std::make_shared<_net::ClientSet>();
 
     this->server_thread = std::thread(&Visualizer::server_job, this);
