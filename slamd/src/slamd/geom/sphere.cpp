@@ -5,7 +5,7 @@
 #include <slamd_common/gmath/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Sphere::Sphere(
     float radius,
@@ -27,18 +27,14 @@ flatbuffers::Offset<slamd::flatb::Geometry> Sphere::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-SpherePtr sphere(
+std::shared_ptr<Sphere> sphere(
     float radius,
     glm::vec3 color
 ) {
-    auto sphere = std::make_shared<_geom::Sphere>(radius, color);
+    auto sphere = std::make_shared<Sphere>(radius, color);
     // _global::geometries.add(sphere->id, sphere);
     return sphere;
 }
-}  // namespace geom
 
+}  // namespace geom
 }  // namespace slamd

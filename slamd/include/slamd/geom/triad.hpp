@@ -4,7 +4,7 @@
 #include <slamd/geom/geometry.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Triad : public Geometry {
    public:
@@ -24,15 +24,8 @@ class Triad : public Geometry {
     glm::mat4 pose;
 };
 
-}  // namespace _geom
-
-namespace geom {
-
-using TriadPtr = std::shared_ptr<_geom::Triad>;
-
-TriadPtr triad(float scale = 1.0, float thickness = 0.1);
-TriadPtr triad(glm::mat4 pose, float scale = 1.0, float thickness = 0.1);
+std::shared_ptr<Triad> triad(float scale = 1.0, float thickness = 0.1);
+std::shared_ptr<Triad> triad(glm::mat4 pose, float scale = 1.0, float thickness = 0.1);
 
 }  // namespace geom
-
 }  // namespace slamd

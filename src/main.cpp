@@ -239,111 +239,111 @@ struct type_caster<std::vector<float>>
 void define_private_geom(
     py::module_& m
 ) {
-    py::class_<slamd::_geom::Geometry, std::shared_ptr<slamd::_geom::Geometry>>(
+    py::class_<slamd::geom::Geometry, std::shared_ptr<slamd::geom::Geometry>>(
         m,
         "Geometry"
     );
 
     py::class_<
-        slamd::_geom::Box,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Box>>(m, "Box");
+        slamd::geom::Box,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Box>>(m, "Box");
 
     py::class_<
-        slamd::_geom::Plane,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Plane>>(m, "Plane");
+        slamd::geom::Plane,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Plane>>(m, "Plane");
 
     py::class_<
-        slamd::_geom::Arrows,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Arrows>>(m, "Arrows");
+        slamd::geom::Arrows,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Arrows>>(m, "Arrows");
 
     py::class_<
-        slamd::_geom::CameraFrustum,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::CameraFrustum>>(m, "CameraFrustum");
+        slamd::geom::CameraFrustum,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::CameraFrustum>>(m, "CameraFrustum");
 
     py::class_<
-        slamd::_geom::PointCloud,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::PointCloud>>(m, "PointCloud")
+        slamd::geom::PointCloud,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::PointCloud>>(m, "PointCloud")
         .def(
             "update_positions",
-            &slamd::_geom::PointCloud::update_positions,
+            &slamd::geom::PointCloud::update_positions,
             py::arg("positions")
         )
         .def(
             "update_colors",
-            &slamd::_geom::PointCloud::update_colors,
+            &slamd::geom::PointCloud::update_colors,
             py::arg("colors")
         )
         .def(
             "update_radii",
-            &slamd::_geom::PointCloud::update_radii,
+            &slamd::geom::PointCloud::update_radii,
             py::arg("radii")
         );
 
     py::class_<
-        slamd::_geom::Spheres,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Spheres>>(m, "Spheres")
+        slamd::geom::Spheres,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Spheres>>(m, "Spheres")
         .def(
             "update_positions",
-            &slamd::_geom::Spheres::update_positions,
+            &slamd::geom::Spheres::update_positions,
             py::arg("positions")
         )
         .def(
             "update_colors",
-            &slamd::_geom::Spheres::update_colors,
+            &slamd::geom::Spheres::update_colors,
             py::arg("colors")
         )
         .def(
             "update_radii",
-            &slamd::_geom::Spheres::update_radii,
+            &slamd::geom::Spheres::update_radii,
             py::arg("radii")
         );
 
     py::class_<
-        slamd::_geom::PolyLine,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::PolyLine>>(m, "PolyLine");
+        slamd::geom::PolyLine,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::PolyLine>>(m, "PolyLine");
 
     py::class_<
-        slamd::_geom::Mesh,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Mesh>>(m, "Mesh")
+        slamd::geom::Mesh,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Mesh>>(m, "Mesh")
         .def(
             "update_positions",
-            &slamd::_geom::Mesh::update_positions,
+            &slamd::geom::Mesh::update_positions,
             py::arg("positions"),
             py::arg("recompute_normals") = true
         )
         .def(
             "update_colors",
-            &slamd::_geom::Mesh::update_colors,
+            &slamd::geom::Mesh::update_colors,
             py::arg("colors")
         )
         .def(
             "update_normals",
-            &slamd::_geom::Mesh::update_normals,
+            &slamd::geom::Mesh::update_normals,
             py::arg("normals")
         );
 
     py::class_<
-        slamd::_geom::Sphere,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Sphere>>(m, "Sphere");
+        slamd::geom::Sphere,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Sphere>>(m, "Sphere");
 
     py::class_<
-        slamd::_geom::Triad,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Triad>>(m, "Triad");
+        slamd::geom::Triad,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Triad>>(m, "Triad");
 
     py::class_<
-        slamd::_geom::Image,
-        slamd::_geom::Geometry,
-        std::shared_ptr<slamd::_geom::Image>>(m, "Image");
+        slamd::geom::Image,
+        slamd::geom::Geometry,
+        std::shared_ptr<slamd::geom::Image>>(m, "Image");
 
 }
 
@@ -539,7 +539,7 @@ PYBIND11_MODULE(
             "set_object",
             [](slamd::Scene& self,
                const std::string& path,
-               std::shared_ptr<slamd::_geom::Geometry> object) {
+               std::shared_ptr<slamd::geom::Geometry> object) {
                 self.set_object(path, object);
             },
             py::arg("path"),
@@ -573,8 +573,8 @@ PYBIND11_MODULE(
         py::arg("executable_path") = std::nullopt
     );
 
-    auto _geom = m.def_submodule("_geom");
-    define_private_geom(_geom);
+    auto geom_types = m.def_submodule("_geom_types");
+    define_private_geom(geom_types);
 
     auto geom = m.def_submodule("geom");
     define_geom(geom);

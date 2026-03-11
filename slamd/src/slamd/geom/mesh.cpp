@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 void Mesh::update_positions(
     const std::vector<glm::vec3>& positions,
@@ -149,18 +149,13 @@ flatbuffers::Offset<slamd::flatb::Geometry> Mesh::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-MeshPtr mesh(
+std::shared_ptr<Mesh> mesh(
     const data::MeshData& mesh_data
 ) {
-    auto mesh = std::make_shared<_geom::Mesh>(mesh_data);
+    auto mesh = std::make_shared<Mesh>(mesh_data);
     // _global::geometries.add(mesh->id, mesh);
     return mesh;
 }
 
 }  // namespace geom
-
 }  // namespace slamd

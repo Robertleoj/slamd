@@ -4,7 +4,7 @@
 #include <slamd/geom/poly_line.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class CameraFrustum : public Geometry {
    public:
@@ -34,13 +34,8 @@ class CameraFrustum : public Geometry {
     float scale;
     std::optional<data::Image> img = std::nullopt;
 };
-}  // namespace _geom
 
-namespace geom {
-
-using CameraFrustumPtr = std::shared_ptr<_geom::CameraFrustum>;
-
-CameraFrustumPtr camera_frustum(
+std::shared_ptr<CameraFrustum> camera_frustum(
     glm::mat3 intrinsics_matrix,
     size_t image_width,
     size_t image_height,
@@ -48,7 +43,7 @@ CameraFrustumPtr camera_frustum(
     float scale = 1.0
 );
 
-CameraFrustumPtr camera_frustum(
+std::shared_ptr<CameraFrustum> camera_frustum(
     glm::mat3 intrinsics_matrix,
     size_t image_width,
     size_t image_height,

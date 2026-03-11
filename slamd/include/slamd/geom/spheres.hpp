@@ -4,7 +4,7 @@
 #include <slamd/geom/geometry.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Spheres : public Geometry {
    public:
@@ -30,13 +30,8 @@ class Spheres : public Geometry {
     float min_brightness;
 };
 
-}  // namespace _geom
-
-namespace geom {
-using SpheresPtr = std::shared_ptr<_geom::Spheres>;
-
 template <typename ColorType, typename RadiiType>
-SpheresPtr spheres(
+std::shared_ptr<Spheres> spheres(
     const std::vector<glm::vec3>& positions,
     const ColorType& colors,
     const RadiiType& radii,
@@ -59,7 +54,7 @@ SpheresPtr spheres(
         final_radii = radii;
     }
 
-    auto c = std::make_shared<_geom::Spheres>(
+    auto c = std::make_shared<Spheres>(
         positions,
         std::move(final_colors),
         std::move(final_radii),

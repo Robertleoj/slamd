@@ -2,7 +2,7 @@
 #include <slamd_common/data/mesh.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Box::Box() {}
 
@@ -18,11 +18,8 @@ flatbuffers::Offset<slamd::flatb::Geometry> Box::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-BoxPtr box() {
-    auto box = std::make_shared<_geom::Box>();
+std::shared_ptr<Box> box() {
+    auto box = std::make_shared<Box>();
     // _global::geometries.add(box->id, box);
     return box;
 }

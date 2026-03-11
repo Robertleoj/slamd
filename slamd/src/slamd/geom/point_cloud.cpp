@@ -5,7 +5,7 @@
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 PointCloud::PointCloud(
     const std::vector<glm::vec3>& positions,
@@ -148,5 +148,5 @@ void PointCloud::update_radii(
     this->broadcast(_utils::builder_buffer(builder));
 }
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

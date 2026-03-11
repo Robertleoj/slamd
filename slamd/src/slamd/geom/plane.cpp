@@ -2,7 +2,7 @@
 #include <slamd_common/gmath/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Plane::Plane(
     glm::vec3 normal,
@@ -42,18 +42,14 @@ flatbuffers::Offset<slamd::flatb::Geometry> Plane::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-PlanePtr plane(
+std::shared_ptr<Plane> plane(
     glm::vec3 normal,
     glm::vec3 point,
     glm::vec3 color,
     float radius,
     float alpha
 ) {
-    return std::make_shared<_geom::Plane>(normal, point, color, radius, alpha);
+    return std::make_shared<Plane>(normal, point, color, radius, alpha);
 }
 
 }  // namespace geom

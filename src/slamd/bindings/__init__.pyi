@@ -4,7 +4,7 @@ SlamDunk visualization library
 from __future__ import annotations
 import numpy
 import typing
-from . import _geom
+from . import _geom_types
 from . import geom
 __all__: list[str] = ['Scene', 'Visualizer', 'geom', 'spawn_window']
 class Scene:

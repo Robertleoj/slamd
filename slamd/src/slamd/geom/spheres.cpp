@@ -5,7 +5,7 @@
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Spheres::Spheres(
     const std::vector<glm::vec3>& positions,
@@ -145,5 +145,5 @@ void Spheres::update_radii(
     this->broadcast(_utils::builder_buffer(builder));
 }
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

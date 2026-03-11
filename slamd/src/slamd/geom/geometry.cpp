@@ -4,7 +4,7 @@
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Geometry::Geometry()
     : id(_id::GeometryID::next()) {}
@@ -95,5 +95,5 @@ Geometry::find_visualizers() {
     return map;
 }
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

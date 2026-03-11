@@ -2,7 +2,7 @@
 #include <slamd/geom/mono_instanced.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 MonoInstanced::MonoInstanced(
     const std::vector<glm::vec3>& vertices,
@@ -50,5 +50,5 @@ void MonoInstanced::update_colors(
     this->colors = colors;
 }
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

@@ -3,7 +3,7 @@
 #include <slamd/geom/mesh.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Box : public Geometry {
    public:
@@ -14,13 +14,7 @@ class Box : public Geometry {
     ) override;
 };
 
-}  // namespace _geom
+std::shared_ptr<Box> box();
 
-namespace geom {
-
-using BoxPtr = std::shared_ptr<_geom::Box>;
-
-BoxPtr box();
 }  // namespace geom
-
 }  // namespace slamd

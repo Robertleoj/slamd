@@ -68,9 +68,9 @@ void Visualizer::add_view(
     this->broadcast(view->get_add_view_message());
 }
 
-std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
 Visualizer::find_geometries() {
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
         current_geometries;
 
     for (auto [_, tree] : this->trees) {
@@ -142,15 +142,15 @@ void Visualizer::remove_view_tree(
 
     auto current_geometries = this->find_geometries();
 
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> tree_geometries;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> tree_geometries;
     tree->add_all_geometries(tree_geometries);
 
-    for (auto [geom_id, geom] : tree_geometries) {
-        auto it = current_geometries.find(geom_id);
+    for (auto [geometry_id, geometry] : tree_geometries) {
+        auto it = current_geometries.find(geometry_id);
 
         if (it == current_geometries.end()) {
             // we need to remove this geometry
-            this->broadcast(geom->get_remove_geometry_message());
+            this->broadcast(geometry->get_remove_geometry_message());
         }
     }
 
@@ -164,7 +164,7 @@ void Visualizer::send_tree(
     std::shared_ptr<Scene> tree
 ) {
     // find all current geometries
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
         current_geometries;
 
     for (auto& [_, existing_tree] : this->trees) {
@@ -172,13 +172,13 @@ void Visualizer::send_tree(
     }
 
     // get all geometries in tree
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> tree_geometries;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> tree_geometries;
     tree->add_all_geometries(tree_geometries);
 
     // get all new geometries
-    for (auto& [gid, geom] : tree_geometries) {
+    for (auto& [gid, geometry] : tree_geometries) {
         if (current_geometries.find(gid) == current_geometries.end()) {
-            this->broadcast(geom->get_add_geometry_message());
+            this->broadcast(geometry->get_add_geometry_message());
         }
     }
 
@@ -206,18 +206,18 @@ flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatb::Geometry>>>
 Visualizer::get_geometries_fb(
     flatbuffers::FlatBufferBuilder& builder
 ) {
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> geom_map;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> geometry_map;
     for (auto [_, tree] : this->trees) {
-        tree->add_all_geometries(geom_map);
+        tree->add_all_geometries(geometry_map);
     }
 
-    std::vector<flatbuffers::Offset<flatb::Geometry>> geoms;
+    std::vector<flatbuffers::Offset<flatb::Geometry>> geometries;
 
-    for (auto& [_, geom] : geom_map) {
-        geoms.push_back(geom->serialize(builder));
+    for (auto& [_, geometry] : geometry_map) {
+        geometries.push_back(geometry->serialize(builder));
     }
 
-    auto geoms_fb = builder.CreateVector(geoms);
+    auto geoms_fb = builder.CreateVector(geometries);
 
     return geoms_fb;
 }
@@ -324,7 +324,7 @@ void Visualizer::hang_forever() {
 }
 }  // namespace _vis
 
-VisualizerPtr visualizer(
+std::shared_ptr<_vis::Visualizer> visualizer(
     std::string name,
     bool spawn,
     uint16_t port

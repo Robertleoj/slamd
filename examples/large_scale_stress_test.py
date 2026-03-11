@@ -29,7 +29,7 @@ def main():
     colors = np.random.uniform(0.2, 1.0, size=(n_points, 3))
     scene.set_object(
         "/point_cloud",
-        slamd.geom.PointCloud(points, colors, point_size=triad_size * 0.2),
+        slamd.geom.PointCloud(points, colors, triad_size * 0.2),
     )
 
     vis.hang_forever()

@@ -5,7 +5,7 @@
 #include <slamd/geom/mesh.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 /**
  * TOOD: use MonoInstanced to allow modifying arrows
@@ -30,13 +30,7 @@ class Arrows : public Geometry {
     float thickness;
 };
 
-}  // namespace _geom
-
-namespace geom {
-
-using ArrowsPtr = std::shared_ptr<_geom::Arrows>;
-
-ArrowsPtr arrows(
+std::shared_ptr<Arrows> arrows(
     const std::vector<glm::vec3>& starts,
     const std::vector<glm::vec3>& ends,
     const std::vector<glm::vec3>& colors,

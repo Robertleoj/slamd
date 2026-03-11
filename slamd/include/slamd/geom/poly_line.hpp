@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class PolyLine : public Geometry {
    public:
@@ -29,13 +29,7 @@ class PolyLine : public Geometry {
     float min_brightness;
 };
 
-}  // namespace _geom
-
-namespace geom {
-
-using PolyLinePtr = std::shared_ptr<_geom::PolyLine>;
-
-PolyLinePtr poly_line(
+std::shared_ptr<PolyLine> poly_line(
     const std::vector<glm::vec3>& points,
     float thickness,
     const glm::vec3& color,
@@ -43,5 +37,4 @@ PolyLinePtr poly_line(
 );
 
 }  // namespace geom
-
 }  // namespace slamd

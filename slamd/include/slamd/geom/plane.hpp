@@ -2,7 +2,7 @@
 #include <slamd/geom/geometry.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Plane : public Geometry {
    public:
@@ -25,13 +25,8 @@ class Plane : public Geometry {
     float radius;
     float alpha;
 };
-}  // namespace _geom
 
-namespace geom {
-
-using PlanePtr = std::shared_ptr<_geom::Plane>;
-
-PlanePtr plane(
+std::shared_ptr<Plane> plane(
     glm::vec3 normal,
     glm::vec3 point,
     glm::vec3 color,

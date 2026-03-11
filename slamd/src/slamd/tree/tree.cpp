@@ -25,7 +25,7 @@ Node::~Node() {
     }
 }
 
-std::optional<std::shared_ptr<_geom::Geometry>> Node::get_object() const {
+std::optional<std::shared_ptr<geom::Geometry>> Node::get_object() const {
     std::scoped_lock l(this->object_mutex);
     if (!this->object.has_value()) {
         return std::nullopt;
@@ -40,7 +40,7 @@ std::optional<glm::mat4> Node::get_transform() const {
 }
 
 void Node::set_object(
-    std::shared_ptr<_geom::Geometry> object
+    std::shared_ptr<geom::Geometry> object
 ) {
     std::scoped_lock l(this->object_mutex);
 
@@ -250,7 +250,7 @@ std::shared_ptr<std::vector<uint8_t>> Scene::get_remove_tree_message() {
 
 void Scene::add_all_geometries_rec(
     _tree::Node* node,
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>& initial_map
 ) {
     for (auto& [_, child] : node->children) {
         this->add_all_geometries_rec(child.get(), initial_map);
@@ -291,7 +291,7 @@ Scene::find_visualizers() {
 }
 
 void Scene::add_all_geometries(
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>& initial_map
 ) {
     this->add_all_geometries_rec(this->root.get(), initial_map);
 }
@@ -311,7 +311,7 @@ void Scene::broadcast(
 
 void Scene::set_object(
     const std::string& path,
-    std::shared_ptr<_geom::Geometry> object
+    std::shared_ptr<geom::Geometry> object
 ) {
     _tree::TreePath treepath(path);
 

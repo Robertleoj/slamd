@@ -17,7 +17,7 @@ namespace _view {
 class View;
 }
 
-namespace _geom {
+namespace geom {
 class Geometry;
 }
 
@@ -32,7 +32,7 @@ class Node : public std::enable_shared_from_this<Node> {
 
     std::optional<glm::mat4> get_transform() const;
 
-    void set_object(std::shared_ptr<_geom::Geometry> object);
+    void set_object(std::shared_ptr<geom::Geometry> object);
 
     void set_transform(glm::mat4 transform);
 
@@ -42,7 +42,7 @@ class Node : public std::enable_shared_from_this<Node> {
     Node& operator=(const Node&) = delete;
 
     // should not be in public API
-    std::optional<std::shared_ptr<_geom::Geometry>> get_object() const;
+    std::optional<std::shared_ptr<geom::Geometry>> get_object() const;
 
     flatbuffers::Offset<slamd::flatb::Node> serialize(
         flatbuffers::FlatBufferBuilder& builder
@@ -63,7 +63,7 @@ class Node : public std::enable_shared_from_this<Node> {
 
    private:
     std::optional<glm::mat4> transform;
-    std::optional<std::shared_ptr<_geom::Geometry>> object;
+    std::optional<std::shared_ptr<geom::Geometry>> object;
 
     mutable std::mutex transform_mutex;
     mutable std::mutex object_mutex;
@@ -80,7 +80,7 @@ class Scene {
 
     void set_object(
         const std::string& path,
-        std::shared_ptr<_geom::Geometry> object
+        std::shared_ptr<geom::Geometry> object
     );
 
     void set_transform(const std::string& path, const glm::mat4& transform);
@@ -92,7 +92,7 @@ class Scene {
     void clear(const std::string& path);
 
     void add_all_geometries(
-        std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
+        std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>& initial_map
     );
 
     std::shared_ptr<std::vector<uint8_t>> get_add_tree_message();
@@ -115,7 +115,7 @@ class Scene {
 
     void add_all_geometries_rec(
         _tree::Node* node,
-        std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>& initial_map
+        std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>& initial_map
     );
 
    private:

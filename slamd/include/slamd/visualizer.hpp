@@ -14,7 +14,7 @@ namespace _view {
 class View;
 }
 
-namespace _geom {
+namespace geom {
 class Geometry;
 }
 
@@ -43,7 +43,7 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
         std::shared_ptr<Scene> tree
     );
 
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> find_geometries(
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> find_geometries(
     );
 
     void delete_view(std::string name);
@@ -75,9 +75,7 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
 
 }  // namespace _vis
 
-using VisualizerPtr = std::shared_ptr<_vis::Visualizer>;
-
-VisualizerPtr
+std::shared_ptr<_vis::Visualizer>
 visualizer(std::string name, bool spawn = true, uint16_t port = 5555);
 
 }  // namespace slamd

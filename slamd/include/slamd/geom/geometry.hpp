@@ -16,7 +16,7 @@ namespace _vis {
 class Visualizer;
 }
 
-namespace _geom {
+namespace geom {
 
 class Geometry {
    public:
@@ -45,5 +45,5 @@ class Geometry {
     std::map<_id::NodeID, std::weak_ptr<_tree::Node>> attached_to;
 };
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd
