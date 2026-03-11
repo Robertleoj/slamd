@@ -61,10 +61,10 @@ if __name__ == "__main__":
 
     scene.set_transform("/rot1/tr", tr)
 
-    t = 0.0
+    t0 = time.monotonic()
     while True:
+        t = time.monotonic() - t0
         rot1 = np.eye(4)
         rot1[:3, :3] = Rotation.from_euler("z", t).as_matrix()
         scene.set_transform("/rot1", rot1)
-        t += 0.01
         time.sleep(10 / 1000)

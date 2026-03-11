@@ -53,9 +53,10 @@ def main():
 
     mesh = None
 
-    t = 0
+    t0 = time.monotonic()
     while True:
         time.sleep(0.01)
+        t = time.monotonic() - t0
         z = f(coords, t)
         points = np.concatenate((coords, z[:, None]), axis=1)
 
@@ -76,7 +77,6 @@ def main():
             mesh.update_positions(points)
             mesh.update_colors(colors)
 
-        t += 0.02
 
 
 if __name__ == "__main__":

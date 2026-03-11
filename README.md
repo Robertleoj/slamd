@@ -15,14 +15,13 @@ Here is a simple "hello world" program for a SlamDunk visualization.
 ```python
 import slamd
 
-if __name__ == "__main__":
-    vis = slamd.Visualizer("Hello world")
+vis = slamd.Visualizer("Hello world")
 
-    scene = vis.scene("scene")
+scene = vis.scene("scene")
 
-    scene.set_object("/origin", slamd.geom.Triad())
+scene.set_object("/origin", slamd.geom.Triad())
 
-    vis.hang_forever()
+vis.hang_forever()
 ```
 
 Running this program results in the following interactive visualization:
@@ -53,25 +52,23 @@ SlamDunk uses ImGui to allow multiple sub-windows with floating and docking supp
 import slamd
 import numpy as np
 
-if __name__ == "__main__":
-    vis = slamd.Visualizer("two windows")
+vis = slamd.Visualizer("two windows")
 
-    scene1 = vis.scene("scene 1")
-    scene2 = vis.scene("scene 2")
+scene1 = vis.scene("scene 1")
+scene2 = vis.scene("scene 2")
 
-    scene1.set_object("/box", slamd.geom.Box())
+scene1.set_object("/box", slamd.geom.Box())
 
-    scene2.set_object("/origin", slamd.geom.Triad())
+scene2.set_object("/origin", slamd.geom.Triad())
 
-    scene2.set_object("/ball", slamd.geom.Sphere(2.0))
+scene2.set_object("/ball", slamd.geom.Sphere(2.0))
 
-    sphere_transform = np.identity(4, dtype=np.float32)
-    sphere_transform[:, 3] = np.array([5.0, 1.0, 2.0, 1.0])
+sphere_transform = np.identity(4, dtype=np.float32)
+sphere_transform[:, 3] = np.array([5.0, 1.0, 2.0, 1.0])
 
-    scene2.set_transform("/ball", sphere_transform)
+scene2.set_transform("/ball", sphere_transform)
 
-    vis.hang_forever()
-
+vis.hang_forever()
 ```
 
 The resulting window looks like this:

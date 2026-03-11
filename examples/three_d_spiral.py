@@ -22,8 +22,9 @@ if __name__ == "__main__":
 
     pink = np.array([212, 13, 125]) / 255
 
-    t = 0.0
+    t0 = time.monotonic()
     while True:
+        t = time.monotonic() - t0
         # make spiral
         coords = cool_spiral(1000, t)
         max_z = coords[:, 2].max()
@@ -33,4 +34,3 @@ if __name__ == "__main__":
         scene.set_object("/poly_line", poly_line)
 
         time.sleep(10 / 1000)
-        t += 0.05

@@ -22,6 +22,7 @@ void run_window(
 ) {
     auto window = glutils::make_window("Slam Dunk", 1000, 1000);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSwapInterval(1);  // Enable VSync for smooth frame pacing
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

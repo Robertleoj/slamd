@@ -18,8 +18,9 @@ if __name__ == "__main__":
 
     vis.add_canvas("canvas", canvas)
 
-    t = 0.0
+    t0 = time.monotonic()
     while True:
+        t = time.monotonic() - t0
         line_points = cool_spiral(10000, t)
 
         poly_line = slamd.geom2d.PolyLine(
@@ -31,4 +32,3 @@ if __name__ == "__main__":
         canvas.set_object("/line", poly_line)
 
         time.sleep(10 / 1000)
-        t += 0.05

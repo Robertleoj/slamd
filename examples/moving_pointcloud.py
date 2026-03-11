@@ -39,9 +39,10 @@ def main():
 
     point_cloud = None
 
-    t = 0
+    t0 = time.monotonic()
     while True:
         time.sleep(0.01)
+        t = time.monotonic() - t0
         z = f(coords, t)
         points = np.concatenate((coords, z[:, None]), axis=1)
 
@@ -62,7 +63,6 @@ def main():
             point_cloud.update_positions(points)
             point_cloud.update_colors(colors)
 
-        t += 0.02
 
 
 if __name__ == "__main__":

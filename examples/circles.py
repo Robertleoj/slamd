@@ -20,20 +20,23 @@ def main():
     circles = slamd.geom2d.Circles(positions, colors, radii, thickness)
     canvas.set_object("/circles", circles)
 
-    t = 0.0
     center = np.array([0.0, 0.0])
+    last_time = time.monotonic()
 
     while True:
-        t += 0.016
+        now = time.monotonic()
+        dt = now - last_time
+        last_time = now
+        t = now
 
         # Orbit swirl
         direction_to_center = center - positions
         distance = np.linalg.norm(direction_to_center, axis=1, keepdims=True) + 1e-6
         normalized = direction_to_center / distance
         perp = np.stack([-normalized[:, 1], normalized[:, 0]], axis=1)
-        velocities += 0.5 * perp
+        velocities += 0.5 * perp * (dt / 0.016)
         velocities *= 0.99
-        positions += velocities * 0.016
+        positions += velocities * dt
 
         # RGB cyclone
         colors = 0.5 + 0.5 * np.stack(
