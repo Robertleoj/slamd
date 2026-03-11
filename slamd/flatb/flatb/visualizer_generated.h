@@ -34,36 +34,6 @@ struct ViewBuilder;
 struct InitialState;
 struct InitialStateBuilder;
 
-enum ViewType : int8_t {
-  ViewType_NONE = 0,
-  ViewType_SCENE = 1,
-  ViewType_MIN = ViewType_NONE,
-  ViewType_MAX = ViewType_SCENE
-};
-
-inline const ViewType (&EnumValuesViewType())[2] {
-  static const ViewType values[] = {
-    ViewType_NONE,
-    ViewType_SCENE
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesViewType() {
-  static const char * const names[3] = {
-    "NONE",
-    "SCENE",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameViewType(ViewType e) {
-  if (::flatbuffers::IsOutRange(e, ViewType_NONE, ViewType_SCENE)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesViewType()[index];
-}
-
 struct ChildEntry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ChildEntryBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -260,8 +230,7 @@ struct View FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ViewBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_TREE_ID = 6,
-    VT_VIEW_TYPE = 8
+    VT_TREE_ID = 6
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
@@ -269,15 +238,11 @@ struct View FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint64_t tree_id() const {
     return GetField<uint64_t>(VT_TREE_ID, 0);
   }
-  slamd::flatb::ViewType view_type() const {
-    return static_cast<slamd::flatb::ViewType>(GetField<int8_t>(VT_VIEW_TYPE, 0));
-  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
            VerifyField<uint64_t>(verifier, VT_TREE_ID, 8) &&
-           VerifyField<int8_t>(verifier, VT_VIEW_TYPE, 1) &&
            verifier.EndTable();
   }
 };
@@ -291,9 +256,6 @@ struct ViewBuilder {
   }
   void add_tree_id(uint64_t tree_id) {
     fbb_.AddElement<uint64_t>(View::VT_TREE_ID, tree_id, 0);
-  }
-  void add_view_type(slamd::flatb::ViewType view_type) {
-    fbb_.AddElement<int8_t>(View::VT_VIEW_TYPE, static_cast<int8_t>(view_type), 0);
   }
   explicit ViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -309,26 +271,22 @@ struct ViewBuilder {
 inline ::flatbuffers::Offset<View> CreateView(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    uint64_t tree_id = 0,
-    slamd::flatb::ViewType view_type = slamd::flatb::ViewType_NONE) {
+    uint64_t tree_id = 0) {
   ViewBuilder builder_(_fbb);
   builder_.add_tree_id(tree_id);
   builder_.add_name(name);
-  builder_.add_view_type(view_type);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<View> CreateViewDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    uint64_t tree_id = 0,
-    slamd::flatb::ViewType view_type = slamd::flatb::ViewType_NONE) {
+    uint64_t tree_id = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   return slamd::flatb::CreateView(
       _fbb,
       name__,
-      tree_id,
-      view_type);
+      tree_id);
 }
 
 struct InitialState FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

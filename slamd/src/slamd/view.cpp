@@ -46,8 +46,7 @@ flatbuffers::Offset<flatb::View> View::serialize(
     auto view_fb = slamd::flatb::CreateView(
         builder,
         view_name_flatb,
-        this->tree->id.value,
-        slamd::flatb::ViewType_SCENE
+        this->tree->id.value
     );
     return view_fb;
 }

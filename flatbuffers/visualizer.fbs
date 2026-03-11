@@ -20,15 +20,9 @@ table Tree {
     root: Node;
 }
 
-enum ViewType: byte {
-    NONE = 0,
-    SCENE = 1
-}
-
 table View {
     name: string;
     tree_id: ulong;
-    view_type: ViewType;
 }
 
 table InitialState {
