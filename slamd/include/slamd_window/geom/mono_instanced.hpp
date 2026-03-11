@@ -18,6 +18,9 @@ class MonoInstanced : public Geometry {
     );
     ~MonoInstanced();
 
+    MonoInstanced(const MonoInstanced&) = delete;
+    MonoInstanced& operator=(const MonoInstanced&) = delete;
+
     void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;
 
     void update_transforms(const std::vector<glm::mat4>& positions);

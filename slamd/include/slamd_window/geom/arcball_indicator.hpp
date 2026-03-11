@@ -11,6 +11,10 @@ class ArcballIndicator : public Geometry {
    public:
     ArcballIndicator();
     ~ArcballIndicator();
+
+    ArcballIndicator(const ArcballIndicator&) = delete;
+    ArcballIndicator& operator=(const ArcballIndicator&) = delete;
+
     void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;
 
     void set_arcball_zoom(float zoom);
