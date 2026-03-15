@@ -1,14 +1,36 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11", "numpy>=1.23"]
+build-backend = "scikit_build_core.build"
+
 [project]
-name = "slamd_dev_env"
-version = "0.1.0"
+name = "slamd"
+version = "3.0.0"
+description = "A 3D visualiztion library"
+authors = [{ name = "Robert Leo", email = "robert.leo.jonsson@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
+dependencies = ["numpy>=1.23"]
+
+[project.scripts]
+slamd-window = "slamd:_window_cli"
+
+[dependency-groups]
+dev = [
     "fire>=0.7.0",
     "imageio>=2.37.0",
     "jinja2>=3.1.6",
-    "numpy>=2.2.4",
+    "numpy>=1.23",
+    "pillow>=10.0",
     "pybind11>=2.13.6",
     "pybind11-stubgen>=2.5.3",
+    "scikit-build-core>=0.10",
     "scipy>=1.15.2",
 ]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.build-type = "MinSizeRel"
+build-dir = "build/{wheel_tag}"
+
+[tool.cibuildwheel]
+skip = ["*musllinux*", "*win*", "pp*"]

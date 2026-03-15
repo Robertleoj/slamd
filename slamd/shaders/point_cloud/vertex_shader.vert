@@ -7,15 +7,12 @@ layout(location = 3) in float a_radius;
 layout(location = 4) in vec3 a_color;
 
 out vec3 o_vertex_color;
-out vec3 o_normal;
 
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
 
 void main() {
-    o_normal = mat3(transpose(inverse(u_model))) * a_normal;
-
     // scale and shift
     vec3 real_pos = (a_model_vertex_pos * a_radius) + a_position;
 

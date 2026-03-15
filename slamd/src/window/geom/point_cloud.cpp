@@ -63,8 +63,8 @@ std::tuple<size_t, uint, uint> PointCloud::initialize_sphere_mesh() {
         mesh_indices,
         vertex_normals,
         1.0f,
-        10,
-        10
+        3,
+        2
     );
 
     // vertex buffer
@@ -296,8 +296,6 @@ void PointCloud::render(
     this->shader.set_uniform("u_model", model);
     this->shader.set_uniform("u_view", view);
     this->shader.set_uniform("u_projection", projection);
-    this->shader.set_uniform("u_light_dir", _const::light_dir);
-    this->shader.set_uniform("u_min_brightness", this->min_brightness);
     gl::glDrawElementsInstanced(
         gl::GL_TRIANGLES,
         this->ball_vertex_count,

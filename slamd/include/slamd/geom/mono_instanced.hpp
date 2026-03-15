@@ -3,7 +3,7 @@
 #include <slamd/geom/geometry.hpp>
 #include <slamd_common/data/mesh.hpp>
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class MonoInstanced : public Geometry {
    public:
@@ -26,5 +26,5 @@ class MonoInstanced : public Geometry {
     std::vector<glm::vec3> colors;
 };
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

@@ -211,15 +211,34 @@ void Mesh::render(
     shader.set_uniform("model", model);
     shader.set_uniform("view", view);
     shader.set_uniform("projection", projection);
-    shader.set_uniform("light_dir", _const::light_dir);
     shader.set_uniform("min_brightness", this->min_brightness);
     shader.set_uniform("alpha", this->mesh_data.alpha);
+
+    bool needs_blend = this->mesh_data.alpha < 1.0f;
+    gl::GLboolean blend_was_enabled = gl::GL_FALSE;
+    gl::GLboolean depth_mask_was_enabled = gl::GL_TRUE;
+    if (needs_blend) {
+        gl::glGetBooleanv(gl::GL_BLEND, &blend_was_enabled);
+        gl::glGetBooleanv(gl::GL_DEPTH_WRITEMASK, &depth_mask_was_enabled);
+        gl::glEnable(gl::GL_BLEND);
+        gl::glBlendFunc(gl::GL_SRC_ALPHA, gl::GL_ONE_MINUS_SRC_ALPHA);
+        gl::glDepthMask(gl::GL_FALSE);
+    }
+
     gl::glDrawElements(
         gl::GL_TRIANGLES,
         this->mesh_data.triangle_indices.size(),
         gl::GL_UNSIGNED_INT,
         0
     );
+
+    if (needs_blend) {
+        gl::glDepthMask(depth_mask_was_enabled);
+        if (blend_was_enabled == gl::GL_FALSE) {
+            gl::glDisable(gl::GL_BLEND);
+        }
+    }
+
     gl::glBindVertexArray(0);
 };
 

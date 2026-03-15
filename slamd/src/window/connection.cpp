@@ -1,3 +1,4 @@
+#include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 #include <slamd_window/connection.hpp>
@@ -18,6 +19,15 @@ Connection::Connection(
 
 Connection::~Connection() {
     this->stop_requested = true;
+
+    {
+        std::lock_guard<std::mutex> lock(this->socket_mutex);
+        if (this->active_socket) {
+            std::error_code ec;
+            this->active_socket->close(ec);
+        }
+    }
+
     if (this->job_thread.joinable()) {
         this->job_thread.join();
     }
@@ -63,7 +73,20 @@ void Connection::job() {
             }
         }
 
+        if (this->stop_requested) break;
+
         auto& socket = socket_opt.value();
+
+        {
+            std::lock_guard<std::mutex> lock(this->socket_mutex);
+            this->active_socket = &socket;
+        }
+
+        if (this->stop_requested) {
+            std::lock_guard<std::mutex> lock(this->socket_mutex);
+            this->active_socket = nullptr;
+            break;
+        }
 
         try {
             uint32_t len_net;
@@ -83,11 +106,17 @@ void Connection::job() {
             );
 
             this->messages.push(std::move(message));
+            glfwPostEmptyEvent();
 
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Error while reading from socket: {}", e.what());
+            {
+                std::lock_guard<std::mutex> lock(this->socket_mutex);
+                this->active_socket = nullptr;
+            }
             connected = false;
-            socket.close();
+            std::error_code ec;
+            socket.close(ec);
             SPDLOG_INFO("Socket closed due to error.");
         }
     }

@@ -228,7 +228,6 @@ void MonoInstanced::render(
     this->shader.set_uniform("u_model", model);
     this->shader.set_uniform("u_view", view);
     this->shader.set_uniform("u_projection", projection);
-    this->shader.set_uniform("u_light_dir", _const::light_dir);
     this->shader.set_uniform(
         "u_min_brightness",
         _const::default_min_brightness

@@ -4,7 +4,7 @@
 #include <slamd/geom/mesh.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Sphere : public Geometry {
    public:
@@ -18,13 +18,7 @@ class Sphere : public Geometry {
     glm::vec3 color;
 };
 
-}  // namespace _geom
-
-namespace geom {
-
-using SpherePtr = std::shared_ptr<_geom::Sphere>;
-
-SpherePtr
+std::shared_ptr<Sphere>
 sphere(float radius = 1.0f, glm::vec3 color = glm::vec3(0.8, 0.2, 0.0));
 
 }  // namespace geom

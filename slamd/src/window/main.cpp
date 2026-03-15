@@ -1,6 +1,7 @@
 #include <flatb/visualizer_generated.h>
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
+#include <cstdlib>
 #include <cxxopts.hpp>
 #include <iostream>
 #include <slamd_window/run_window.hpp>
@@ -12,8 +13,8 @@ int main(
     spdlog::set_level(spdlog::level::debug);
 
     cxxopts::Options options(
-        "SlamDunk Window",
-        "The viewer for the SlamDunk library"
+        "slamd Window",
+        "The viewer for the slamd library"
     );
 
     // clang-format off
@@ -50,4 +51,6 @@ int main(
     state_manager.try_connect(ip, port);
 
     slamd::run_window(state_manager);
+
+    std::exit(0);
 }

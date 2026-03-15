@@ -13,12 +13,16 @@ glm::vec3 make_background_color(
     return glm::vec3(0.1f, 0.1f, 0.1f);
 }
 
+void SceneView::mark_dirty() {
+    this->_dirty = true;
+}
+
 SceneView::SceneView(
     std::shared_ptr<Tree> tree
 )
-    : View(std::move(tree)),
+    : tree(std::move(tree)),
       frame_buffer(500, 500),
-      camera(45.0, 0.1f, 100000.0f),
+      camera(45.0, 0.001, 100.0),
       xy_grid(1000.0) {
     this->xy_grid.set_arcball_zoom(this->arcball.radius);
     this->arcball_indicator.set_arcball_zoom(this->arcball.radius);
@@ -68,8 +72,10 @@ void SceneView::render_to_frame_buffer() {
     );
     gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
-    auto projection =
-        this->camera.get_projection_matrix(this->frame_buffer.aspect());
+    auto projection = this->camera.get_projection_matrix(
+        this->frame_buffer.aspect(),
+        this->arcball.radius
+    );
 
     this->tree->render(view, projection);
 

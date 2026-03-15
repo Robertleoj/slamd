@@ -6,10 +6,21 @@
 #include <slamd_window/geom/arcball_indicator.hpp>
 #include <slamd_window/geom/xy_grid.hpp>
 #include <slamd_window/tree/tree.hpp>
-#include <slamd_window/view/view.hpp>
+#include <slamd_window/tree_overlay.hpp>
 
 namespace slamd {
-class SceneView : public View {
+class SceneView {
+   public:
+    SceneView(std::shared_ptr<Tree> tree);
+    void render_to_imgui();
+
+    void mark_dirty();
+
+   public:
+    bool _dirty = true;
+    std::shared_ptr<Tree> tree;
+    TreeOverlay tree_overlay;
+
    private:
     FrameBuffer frame_buffer;
     Arcball arcball;
@@ -18,11 +29,6 @@ class SceneView : public View {
     _geom::GridXYPlane xy_grid;
     _geom::ArcballIndicator arcball_indicator;
 
-   public:
-    SceneView(std::shared_ptr<Tree> tree);
-    void render_to_imgui() override;
-
-   private:
     void handle_input();
     void handle_translation_input();
     void handle_mouse_input();

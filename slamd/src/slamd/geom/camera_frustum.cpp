@@ -4,7 +4,7 @@
 #include <slamd_common/gmath/transforms.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 CameraFrustum::CameraFrustum(
     glm::mat3 intrinsics_matrix,
@@ -66,18 +66,14 @@ flatbuffers::Offset<slamd::flatb::Geometry> CameraFrustum::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-CameraFrustumPtr camera_frustum(
+std::shared_ptr<CameraFrustum> camera_frustum(
     glm::mat3 intrinsics_matrix,
     size_t image_width,
     size_t image_height,
     data::Image&& image,
     float scale
 ) {
-    auto cam = std::make_shared<_geom::CameraFrustum>(
+    auto cam = std::make_shared<CameraFrustum>(
         intrinsics_matrix,
         image_width,
         image_height,
@@ -89,13 +85,13 @@ CameraFrustumPtr camera_frustum(
     return cam;
 }
 
-CameraFrustumPtr camera_frustum(
+std::shared_ptr<CameraFrustum> camera_frustum(
     glm::mat3 intrinsics_matrix,
     size_t image_width,
     size_t image_height,
     float scale
 ) {
-    auto cam = std::make_shared<_geom::CameraFrustum>(
+    auto cam = std::make_shared<CameraFrustum>(
         intrinsics_matrix,
         image_width,
         image_height,

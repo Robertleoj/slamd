@@ -6,3 +6,7 @@ build/
 **/*__pycache__
 .cache/
 .testvenv/
+dist/
+*.egg-info/
+_skbuild/
+src/slamd/slamd_window

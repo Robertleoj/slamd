@@ -26,6 +26,9 @@ class Mesh : public Geometry {
 
     ~Mesh();
 
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+
     static std::shared_ptr<Mesh> deserialize(const slamd::flatb::Mesh* mesh_fb);
 
     void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;

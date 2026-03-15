@@ -5,13 +5,11 @@
 #include <memory>
 #include <slamd_common/gmath/serialization.hpp>
 #include <slamd_common/gmath/stringify.hpp>
-#include <slamd_window/geom/circles_2d.hpp>
+#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/mesh.hpp>
 #include <slamd_window/geom/point_cloud.hpp>
 #include <slamd_window/state_manager.hpp>
-#include <slamd_window/view/canvas_view.hpp>
 #include <slamd_window/view/scene_view.hpp>
-#include <slamd_window/view/view.hpp>
 
 namespace slamd {
 
@@ -61,7 +59,7 @@ void StateManager::handle_initial_state(
 
         auto tree = this->trees.at(tree_id);
 
-        auto view = View::deserialize(view_fb, tree);
+        auto view = std::make_unique<SceneView>(tree);
 
         this->views.insert({view_name, std::move(view)});
     }
@@ -154,7 +152,7 @@ void StateManager::handle_add_view(
 
     auto tree = this->trees.at(tree_id);
 
-    auto view = View::deserialize(view_fb, tree);
+    auto view = std::make_unique<SceneView>(tree);
     auto view_name = view_fb->name()->str();
 
     this->views.insert({view_name, std::move(view)});
@@ -187,36 +185,6 @@ void StateManager::handle_update_mesh_normals(
     geom->update_normals(normals);
 }
 
-void StateManager::handle_update_circles2d_positions(
-    const slamd::flatb::UpdateCircles2DPositions* update_fb
-) {
-    auto id = _id::GeometryID(update_fb->object_id());
-    auto geom =
-        std::dynamic_pointer_cast<_geom::Circles2D>(this->geometries.at(id));
-    auto data = gmath::deserialize_vector(update_fb->positions());
-    geom->update_positions(data);
-}
-
-void StateManager::handle_update_circles2d_colors(
-    const slamd::flatb::UpdateCircles2DColors* update_fb
-) {
-    auto id = _id::GeometryID(update_fb->object_id());
-    auto geom =
-        std::dynamic_pointer_cast<_geom::Circles2D>(this->geometries.at(id));
-    auto data = gmath::deserialize_vector(update_fb->colors());
-    geom->update_colors(data);
-}
-
-void StateManager::handle_update_circles2d_radii(
-    const slamd::flatb::UpdateCircles2DRadii* update_fb
-) {
-    auto id = _id::GeometryID(update_fb->object_id());
-    auto geom =
-        std::dynamic_pointer_cast<_geom::Circles2D>(this->geometries.at(id));
-    auto data = gmath::deserialize_vector(update_fb->radii());
-    geom->update_radii(data);
-}
-
 void StateManager::handle_update_point_cloud_positions(
     const slamd::flatb::UpdatePointCloudPositions* update_fb
 ) {
@@ -243,6 +211,36 @@ void StateManager::handle_update_point_cloud_radii(
     auto id = _id::GeometryID(update_fb->object_id());
     auto geom =
         std::dynamic_pointer_cast<_geom::PointCloud>(this->geometries.at(id));
+    auto data = gmath::deserialize_vector(update_fb->radii());
+    geom->update_radii(data);
+}
+
+void StateManager::handle_update_spheres_positions(
+    const slamd::flatb::UpdateSpheresPositions* update_fb
+) {
+    auto id = _id::GeometryID(update_fb->object_id());
+    auto geom =
+        std::dynamic_pointer_cast<_geom::Spheres>(this->geometries.at(id));
+    auto data = gmath::deserialize_vector(update_fb->positions());
+    geom->update_positions(data);
+}
+
+void StateManager::handle_update_spheres_colors(
+    const slamd::flatb::UpdateSpheresColors* update_fb
+) {
+    auto id = _id::GeometryID(update_fb->object_id());
+    auto geom =
+        std::dynamic_pointer_cast<_geom::Spheres>(this->geometries.at(id));
+    auto data = gmath::deserialize_vector(update_fb->colors());
+    geom->update_colors(data);
+}
+
+void StateManager::handle_update_spheres_radii(
+    const slamd::flatb::UpdateSpheresRadii* update_fb
+) {
+    auto id = _id::GeometryID(update_fb->object_id());
+    auto geom =
+        std::dynamic_pointer_cast<_geom::Spheres>(this->geometries.at(id));
     auto data = gmath::deserialize_vector(update_fb->radii());
     geom->update_radii(data);
 }
@@ -331,24 +329,6 @@ bool StateManager::apply_updates() {
                 );
                 break;
             }
-            case (slamd::flatb::MessageUnion_update_circles2d_colors): {
-                this->handle_update_circles2d_colors(
-                    message_fb->message_as_update_circles2d_colors()
-                );
-                break;
-            }
-            case (slamd::flatb::MessageUnion_update_circles2d_positions): {
-                this->handle_update_circles2d_positions(
-                    message_fb->message_as_update_circles2d_positions()
-                );
-                break;
-            }
-            case (slamd::flatb::MessageUnion_update_circles2d_radii): {
-                this->handle_update_circles2d_radii(
-                    message_fb->message_as_update_circles2d_radii()
-                );
-                break;
-            }
             case (slamd::flatb::MessageUnion_update_point_cloud_colors): {
                 this->handle_update_point_cloud_colors(
                     message_fb->message_as_update_point_cloud_colors()
@@ -364,6 +344,24 @@ bool StateManager::apply_updates() {
             case (slamd::flatb::MessageUnion_update_point_cloud_radii): {
                 this->handle_update_point_cloud_radii(
                     message_fb->message_as_update_point_cloud_radii()
+                );
+                break;
+            }
+            case (slamd::flatb::MessageUnion_update_spheres_positions): {
+                this->handle_update_spheres_positions(
+                    message_fb->message_as_update_spheres_positions()
+                );
+                break;
+            }
+            case (slamd::flatb::MessageUnion_update_spheres_colors): {
+                this->handle_update_spheres_colors(
+                    message_fb->message_as_update_spheres_colors()
+                );
+                break;
+            }
+            case (slamd::flatb::MessageUnion_update_spheres_radii): {
+                this->handle_update_spheres_radii(
+                    message_fb->message_as_update_spheres_radii()
                 );
                 break;
             }

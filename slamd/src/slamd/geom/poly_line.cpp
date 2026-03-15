@@ -5,7 +5,7 @@
 #include <slamd_common/gmath/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 PolyLine::PolyLine(
     const std::vector<glm::vec3>& points,
@@ -39,17 +39,13 @@ flatbuffers::Offset<slamd::flatb::Geometry> PolyLine::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-PolyLinePtr poly_line(
+std::shared_ptr<PolyLine> poly_line(
     const std::vector<glm::vec3>& points,
     float thickness,
     const glm::vec3& color,
     float min_brightness
 ) {
-    auto poly_line = std::make_shared<_geom::PolyLine>(
+    auto poly_line = std::make_shared<PolyLine>(
         points,
         thickness,
         color,
@@ -58,5 +54,6 @@ PolyLinePtr poly_line(
     // _global::geometries.add(poly_line->id, poly_line);
     return poly_line;
 }
+
 }  // namespace geom
 }  // namespace slamd

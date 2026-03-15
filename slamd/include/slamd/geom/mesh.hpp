@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Mesh : public Geometry {
    public:
@@ -42,13 +42,7 @@ class Mesh : public Geometry {
     float min_brightness;
 };
 
-}  // namespace _geom
-
-namespace geom {
-
-using MeshPtr = std::shared_ptr<_geom::Mesh>;
-
-MeshPtr mesh(const data::MeshData& mesh_data);
+std::shared_ptr<Mesh> mesh(const data::MeshData& mesh_data);
 
 }  // namespace geom
 }  // namespace slamd

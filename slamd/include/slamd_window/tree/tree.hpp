@@ -17,8 +17,7 @@ class Tree {
     Tree(uint64_t id);
     Tree(uint64_t id, std::unique_ptr<Node>&& root);
 
-    virtual void
-    set_object(const TreePath& path, std::shared_ptr<_geom::Geometry> object);
+    void set_object(const TreePath& path, std::shared_ptr<_geom::Geometry> object);
 
     void render(const glm::mat4& view, const glm::mat4& projection) const;
 
@@ -33,7 +32,7 @@ class Tree {
     void clear(const TreePath& path);
     void mark_nodes_matching_glob(std::optional<TreePath> glob);
 
-   protected:
+   private:
     std::optional<Node*> traverse(const TreePath& path);
     Node* make_path(TreePath path);
 

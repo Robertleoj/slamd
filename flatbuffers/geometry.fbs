@@ -8,13 +8,6 @@ table Triad {
     pose: Mat4;
 }
 
-table Circles2D {
-    positions: [Vec2];
-    colors: [Vec3];
-    radii: [float];
-    thickness: float;
-}
-
 table CameraFrustum {
     intrinsics: Mat3;
     image_width: uint32;
@@ -33,12 +26,6 @@ table PointCloud {
 table Image {
     img: ImageData;
     normalized: bool;
-}
-
-table Points2D {
-    positions: [Vec2];
-    colors: [Vec3];
-    radii: [float];
 }
 
 table Box {}
@@ -62,14 +49,15 @@ table PolyLine {
     min_brightness: float;
 }
 
-table PolyLine2D {
-    points: [Vec2];
-    color: Vec3;
-    thickness: float;
-}
-
 table Mesh {
     data: MeshData;
+    min_brightness: float;
+}
+
+table Spheres {
+    positions: [Vec3];
+    colors: [Vec3];
+    radii: [float];
     min_brightness: float;
 }
 
@@ -83,18 +71,16 @@ table Plane {
 
 union GeometryUnion {
     triad: Triad,
-    circles_2d: Circles2D,
     camera_frustum: CameraFrustum,
     point_cloud: PointCloud,
     image: Image,
-    points_2d: Points2D,
     box: Box,
     sphere: Sphere,
     arrows: Arrows,
     poly_line: PolyLine,
-    poly_line_2d: PolyLine2D,
     mesh: Mesh,
-    plane: Plane
+    plane: Plane,
+    spheres: Spheres
 }
 
 table Geometry {

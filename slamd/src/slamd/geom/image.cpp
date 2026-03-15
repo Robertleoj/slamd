@@ -1,7 +1,7 @@
 #include <slamd/geom/image.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Image::Image(
     data::Image&& image,
@@ -26,31 +26,14 @@ flatbuffers::Offset<slamd::flatb::Geometry> Image::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-ImagePtr image(
+std::shared_ptr<Image> image(
     data::Image&& image
 ) {
-    auto img = std::make_shared<_geom::Image>(std::move(image), true);
+    auto img = std::make_shared<Image>(std::move(image), true);
 
     // _global::geometries.add(img->id, img);
     return img;
 }
+
 }  // namespace geom
-
-namespace geom2d {
-
-ImagePtr image(
-    data::Image&& image
-) {
-    auto img = std::make_shared<_geom::Image>(std::move(image), false);
-
-    // _global::geometries.add(img->id, img);
-    return img;
-}
-
-}  // namespace geom2d
-
 }  // namespace slamd

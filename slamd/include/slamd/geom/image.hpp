@@ -4,7 +4,7 @@
 #include <slamd_common/data/image.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 class Image : public Geometry {
    public:
@@ -19,19 +19,7 @@ class Image : public Geometry {
     bool normalized;
 };
 
-}  // namespace _geom
+std::shared_ptr<Image> image(data::Image&& image);
 
-namespace geom {
-using ImagePtr = std::shared_ptr<_geom::Image>;
-
-ImagePtr image(data::Image&& image);
 }  // namespace geom
-
-namespace geom2d {
-using ImagePtr = std::shared_ptr<_geom::Image>;
-
-ImagePtr image(data::Image&& image);
-
-}  // namespace geom2d
-
 }  // namespace slamd

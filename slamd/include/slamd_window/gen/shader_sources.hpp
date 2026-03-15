@@ -92,15 +92,34 @@ in vec3 vertex_color;
 
 out vec4 FragColor;
 
-uniform vec3 light_dir;
+uniform mat4 view;
 uniform float min_brightness;
 uniform float alpha;
 
 void main() {
     vec3 norm = normalize(Normal);
-    float diff =
-        max(dot(norm, normalize(light_dir)), min_brightness);  // never too dark
-    FragColor = vec4(vertex_color * diff, alpha);
+
+    // Camera-relative lighting: extract camera forward and right from view matrix
+    vec3 cam_forward = normalize(vec3(view[0][2], view[1][2], view[2][2]));
+    vec3 cam_right = normalize(vec3(view[0][0], view[1][0], view[2][0]));
+
+    // Key light: slightly offset from camera direction
+    vec3 key_dir = normalize(cam_forward + 0.3 * cam_right);
+    float key = max(dot(norm, key_dir), 0.0);
+
+    // Fill light: from the opposite side, softer
+    vec3 fill_dir = normalize(cam_forward - 0.5 * cam_right);
+    float fill = max(dot(norm, fill_dir), 0.0) * 0.4;
+
+    // Blinn-Phong specular (using camera forward as view direction)
+    vec3 half_dir = normalize(key_dir + cam_forward);
+    float spec = pow(max(dot(norm, half_dir), 0.0), 32.0) * 0.3;
+
+    float ambient = min_brightness;
+    float lighting = ambient + (1.0 - ambient) * (key + fill);
+    lighting = min(lighting, 1.0);
+
+    FragColor = vec4(vertex_color * lighting + vec3(spec), alpha);
 } )";
 }  // namespace mesh
 
@@ -142,15 +161,30 @@ in vec3 o_vertex_color;
 
 out vec4 FragColor;
 
-uniform vec3 u_light_dir;
+uniform mat4 u_view;
 uniform float u_min_brightness;
 
 void main() {
     vec3 norm = normalize(o_normal);
-    float diff =
-        max(dot(norm, normalize(u_light_dir)),
-            u_min_brightness);  // never too dark
-    FragColor = vec4(o_vertex_color * diff, 1.0);
+
+    vec3 cam_forward = normalize(vec3(u_view[0][2], u_view[1][2], u_view[2][2]));
+    vec3 cam_right = normalize(vec3(u_view[0][0], u_view[1][0], u_view[2][0]));
+
+    vec3 key_dir = normalize(cam_forward + 0.3 * cam_right);
+    float key = max(dot(norm, key_dir), 0.0);
+
+    vec3 fill_dir = normalize(cam_forward - 0.5 * cam_right);
+    float fill = max(dot(norm, fill_dir), 0.0) * 0.4;
+
+    // Blinn-Phong specular (using camera forward as view direction)
+    vec3 half_dir = normalize(key_dir + cam_forward);
+    float spec = pow(max(dot(norm, half_dir), 0.0), 32.0) * 0.3;
+
+    float ambient = u_min_brightness;
+    float lighting = ambient + (1.0 - ambient) * (key + fill);
+    lighting = min(lighting, 1.0);
+
+    FragColor = vec4(o_vertex_color * lighting + vec3(spec), 1.0);
 } )";
 }  // namespace mono_instanced
 
@@ -164,15 +198,12 @@ layout(location = 3) in float a_radius;
 layout(location = 4) in vec3 a_color;
 
 out vec3 o_vertex_color;
-out vec3 o_normal;
 
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
 
 void main() {
-    o_normal = mat3(transpose(inverse(u_model))) * a_normal;
-
     // scale and shift
     vec3 real_pos = (a_model_vertex_pos * a_radius) + a_position;
 
@@ -182,20 +213,12 @@ void main() {
  )";
 inline const std::string frag = R"( #version 330 core
 
-in vec3 o_normal;
 in vec3 o_vertex_color;
 
 out vec4 FragColor;
 
-uniform vec3 u_light_dir;
-uniform float u_min_brightness;
-
 void main() {
-    vec3 norm = normalize(o_normal);
-    float diff =
-        max(dot(norm, normalize(u_light_dir)),
-            u_min_brightness);  // never too dark
-    FragColor = vec4(o_vertex_color * diff, 1.0);
+    FragColor = vec4(o_vertex_color, 1.0);
 } )";
 }  // namespace point_cloud
 
@@ -233,7 +256,7 @@ void main() {
 
     float alpha = clamp(
         1.0 - (dist / (uScale * 100.0)), 0.0, 1.0
-    );  // adjust 20.0 to control fade range
+    );
 
     FragColor = vec4(uColor, alpha * uExtraAlpha);
 }

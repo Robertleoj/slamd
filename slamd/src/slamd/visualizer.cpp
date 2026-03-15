@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 #include <slamd/spawn_window.hpp>
+#include <slamd/tree/tree.hpp>
+#include <slamd/view.hpp>
 #include <slamd/visualizer.hpp>
 
 namespace slamd {
@@ -22,15 +24,14 @@ Visualizer::Visualizer(
 
 void Visualizer::add_view(
     std::string name,
-    std::shared_ptr<_tree::Tree> tree,
-    slamd::flatb::ViewType type
+    std::shared_ptr<Scene> tree
 ) {
     if (this->trees.find(tree->id) == this->trees.end()) {
         this->send_tree(tree);
         this->trees.insert({tree->id, tree});
     }
 
-    auto view = _view::View::create(name, this->shared_from_this(), tree, type);
+    auto view = _view::View::create(name, this->shared_from_this(), tree);
 
     std::optional<std::shared_ptr<_view::View>> to_remove;
     {
@@ -52,9 +53,9 @@ void Visualizer::add_view(
     this->broadcast(view->get_add_view_message());
 }
 
-std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
 Visualizer::find_geometries() {
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
         current_geometries;
 
     for (auto [_, tree] : this->trees) {
@@ -94,12 +95,6 @@ void Visualizer::delete_view(
     this->remove_view_tree(to_delete);
 }
 
-void Visualizer::delete_canvas(
-    std::string name
-) {
-    this->delete_view(name);
-}
-
 void Visualizer::remove_view_tree(
     std::shared_ptr<_view::View> view
 ) {
@@ -132,15 +127,15 @@ void Visualizer::remove_view_tree(
 
     auto current_geometries = this->find_geometries();
 
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> tree_geometries;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> tree_geometries;
     tree->add_all_geometries(tree_geometries);
 
-    for (auto [geom_id, geom] : tree_geometries) {
-        auto it = current_geometries.find(geom_id);
+    for (auto [geometry_id, geometry] : tree_geometries) {
+        auto it = current_geometries.find(geometry_id);
 
         if (it == current_geometries.end()) {
             // we need to remove this geometry
-            this->broadcast(geom->get_remove_geometry_message());
+            this->broadcast(geometry->get_remove_geometry_message());
         }
     }
 
@@ -151,10 +146,10 @@ void Visualizer::remove_view_tree(
 }
 
 void Visualizer::send_tree(
-    std::shared_ptr<_tree::Tree> tree
+    std::shared_ptr<Scene> tree
 ) {
     // find all current geometries
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>>
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>>
         current_geometries;
 
     for (auto& [_, existing_tree] : this->trees) {
@@ -162,13 +157,13 @@ void Visualizer::send_tree(
     }
 
     // get all geometries in tree
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> tree_geometries;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> tree_geometries;
     tree->add_all_geometries(tree_geometries);
 
     // get all new geometries
-    for (auto& [gid, geom] : tree_geometries) {
+    for (auto& [gid, geometry] : tree_geometries) {
         if (current_geometries.find(gid) == current_geometries.end()) {
-            this->broadcast(geom->get_add_geometry_message());
+            this->broadcast(geometry->get_add_geometry_message());
         }
     }
 
@@ -181,15 +176,7 @@ void Visualizer::add_scene(
     std::string name,
     std::shared_ptr<Scene> scene
 ) {
-    this->add_view(name, scene, slamd::flatb::ViewType_SCENE);
-}
-
-std::shared_ptr<Canvas> Visualizer::canvas(
-    std::string name
-) {
-    auto canvas = slamd::canvas();
-    this->add_canvas(name, canvas);
-    return canvas;
+    this->add_view(name, scene);
 }
 
 std::shared_ptr<Scene> Visualizer::scene(
@@ -200,29 +187,22 @@ std::shared_ptr<Scene> Visualizer::scene(
     return scene;
 }
 
-void Visualizer::add_canvas(
-    std::string name,
-    std::shared_ptr<Canvas> canvas
-) {
-    this->add_view(name, canvas, slamd::flatb::ViewType_CANVAS);
-}
-
 flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatb::Geometry>>>
 Visualizer::get_geometries_fb(
     flatbuffers::FlatBufferBuilder& builder
 ) {
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> geom_map;
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> geometry_map;
     for (auto [_, tree] : this->trees) {
-        tree->add_all_geometries(geom_map);
+        tree->add_all_geometries(geometry_map);
     }
 
-    std::vector<flatbuffers::Offset<flatb::Geometry>> geoms;
+    std::vector<flatbuffers::Offset<flatb::Geometry>> geometries;
 
-    for (auto& [_, geom] : geom_map) {
-        geoms.push_back(geom->serialize(builder));
+    for (auto& [_, geometry] : geometry_map) {
+        geometries.push_back(geometry->serialize(builder));
     }
 
-    auto geoms_fb = builder.CreateVector(geoms);
+    auto geoms_fb = builder.CreateVector(geometries);
 
     return geoms_fb;
 }
@@ -281,11 +261,11 @@ std::vector<uint8_t> Visualizer::get_state() {
 }
 
 void Visualizer::server_job() {
-    asio::io_context io;
-    asio::ip::tcp::acceptor acceptor(
-        io,
-        asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)
-    );
+    asio::ip::tcp::acceptor acceptor(this->io_context);
+    acceptor.open(asio::ip::tcp::v4());
+    acceptor.set_option(asio::socket_base::reuse_address(true));
+    acceptor.bind(asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
+    acceptor.listen();
 
     std::function<void(void)> accept_loop = [&]() {
         acceptor.async_accept([&](std::error_code ec,
@@ -307,10 +287,10 @@ void Visualizer::server_job() {
         while (!this->stop_requested) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        io.stop();  // tell io to bounce
+        this->io_context.stop();
     });
 
-    io.run();
+    this->io_context.run();
 
     stop_watcher.join();
 }
@@ -329,7 +309,7 @@ void Visualizer::hang_forever() {
 }
 }  // namespace _vis
 
-VisualizerPtr visualizer(
+std::shared_ptr<_vis::Visualizer> visualizer(
     std::string name,
     bool spawn,
     uint16_t port

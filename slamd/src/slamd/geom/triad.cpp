@@ -3,7 +3,7 @@
 #include <slamd_common/gmath/transforms.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Triad::Triad(
     float scale,
@@ -30,28 +30,24 @@ flatbuffers::Offset<slamd::flatb::Geometry> Triad::serialize(
     );
 }
 
-}  // namespace _geom
-
-namespace geom {
-
-TriadPtr triad(
+std::shared_ptr<Triad> triad(
     float scale,
     float thickness
 ) {
-    auto triad = std::make_shared<_geom::Triad>(scale, thickness);
+    auto triad = std::make_shared<Triad>(scale, thickness);
     // _global::geometries.add(triad->id, triad);
     return triad;
 }
 
-TriadPtr triad(
+std::shared_ptr<Triad> triad(
     glm::mat4 pose,
     float scale,
     float thickness
 ) {
-    auto triad = std::make_shared<_geom::Triad>(scale, thickness, pose);
+    auto triad = std::make_shared<Triad>(scale, thickness, pose);
     // _global::geometries.add(triad->id, triad);
     return triad;
 }
-}  // namespace geom
 
+}  // namespace geom
 }  // namespace slamd

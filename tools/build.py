@@ -1,98 +1,74 @@
 #!/usr/bin/env python3
 
-"""A script to build the C++ backend and install the bindings into the source tree."""
+"""Build script for slamd: codegen + editable install + stubs."""
 
-import shutil
-import os
 import subprocess
-from functools import partial
+import sys
 from pathlib import Path
-from embed_shaders import embed_shaders
 
-from fire import Fire
-
-BUILD_DIR = "build"
+REPO_DIR = Path(__file__).parent.parent.resolve()
 
 
-def build(debug: bool) -> None:
-    """(Re)build the C++ backend."""
+def main():
+    print("=== Syncing dev dependencies ===")
+    subprocess.run(
+        ["uv", "sync", "--group", "dev", "--no-install-project"],
+        cwd=REPO_DIR,
+        check=True,
+    )
+
+    from build_flatbuffers import compile_flatbuffers
+    from embed_shaders import embed_shaders
+
+    print("\n=== Compiling flatbuffers ===")
+    compile_flatbuffers()
+
+    print("\n=== Embedding shaders ===")
     embed_shaders()
 
-    build_path = Path("build")
-    build_path.mkdir(exist_ok=True)
-
-    compile_cmd = [
-        "cmake",
-        "-B",
-        str(build_path),
-        "-G",
-        "Ninja",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
-        "-DCMAKE_C_COMPILER=/usr/bin/gcc-13",
-        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-13",
-        '-DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld"',
-        '-DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld"',
-        '-DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld"',
-    ]
-
-    if debug:
-        compile_cmd.append("-DCMAKE_BUILD_TYPE=Debug")
-
-    subprocess.run(
-        compile_cmd,
-        check=True,
-    )
-
-    subprocess.run(["ninja", "-C", str(build_path)])
-
+    print("\n=== Installing package (editable) ===")
     subprocess.run(
         [
-            "pybind11-stubgen",
-            "slamd.bindings",
-            # "--numpy-array-remove-parameters",
-            "-o",
-            "python_bindings/src",
+            "uv",
+            "pip",
+            "install",
+            "--force-reinstall",
+            "--no-build-isolation",
+            "-e",
+            ".",
         ],
-        env={**os.environ, "PYTHONPATH": "./build/python_bindings"},
+        cwd=REPO_DIR,
         check=True,
     )
 
+    print("\n=== Symlinking slamd_window into source tree ===")
+    build_dirs = sorted(Path(REPO_DIR / "build").glob("*/slamd/slamd_window"))
+    if build_dirs:
+        exe = build_dirs[-1].resolve()
+        link = REPO_DIR / "src" / "slamd" / "slamd_window"
+        link.unlink(missing_ok=True)
+        link.symlink_to(exe)
+        print(f"  {link} -> {exe}")
+    else:
+        print("  WARNING: slamd_window not found in build directory")
 
-def clean() -> None:
-    """Clean the build folder and remove the symlink, if any."""
-    shutil.rmtree(BUILD_DIR, ignore_errors=True)
+    print("\n=== Generating type stubs ===")
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pybind11_stubgen",
+            "slamd.bindings",
+            "--numpy-array-remove-parameters",
+            "-o",
+            "src",
+        ],
+        cwd=REPO_DIR,
+        check=True,
+    )
 
-
-def clean_build() -> None:
-    """First clean and then build."""
-    clean()
-    build(False)
-
-
-def debug_build():
-    build(True)
-
-
-def clean_debug_build():
-    clean()
-    build(True)
-
-
-def check_in_repo() -> None:
-    """Check that we are executing this from repo root."""
-    assert Path(".git").exists(), "This command should run in repo root."
+    print("\n=== Done ===")
 
 
 if __name__ == "__main__":
-    check_in_repo()
-    # os.chdir(Path("./examples"))
-
-    Fire(
-        {
-            "build": partial(build, False),
-            "clean": clean,
-            "clean_build": clean_build,
-            "debug_build": debug_build,
-            "clean_debug_build": clean_debug_build,
-        }
-    )
+    main()

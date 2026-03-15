@@ -1,9 +1,10 @@
 #include <flatb/messages_generated.h>
 #include <slamd/geom/geometry.hpp>
+#include <slamd/visualizer.hpp>
 #include <slamd_common/utils/serialization.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 Geometry::Geometry()
     : id(_id::GeometryID::next()) {}
@@ -94,5 +95,5 @@ Geometry::find_visualizers() {
     return map;
 }
 
-}  // namespace _geom
+}  // namespace geom
 }  // namespace slamd

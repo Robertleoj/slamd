@@ -14,6 +14,9 @@ class GridXYPlane : public Geometry {
 
     ~GridXYPlane() override;
 
+    GridXYPlane(const GridXYPlane&) = delete;
+    GridXYPlane& operator=(const GridXYPlane&) = delete;
+
     void set_arcball_zoom(float zoom);
 
    private:

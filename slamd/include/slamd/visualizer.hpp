@@ -1,29 +1,24 @@
 #pragma once
 #include <asio.hpp>
+#include <flatb/geometry_generated.h>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <slamd/net/client_set.hpp>
-#include <slamd/tree/tree.hpp>
-#include <slamd/view.hpp>
 #include <slamd_common/id.hpp>
 #include <thread>
 
 namespace slamd {
-namespace _id {}  // namespace _id
 
 namespace _view {
 class View;
 }
 
-namespace _tree {
-class Tree;
-}
-namespace _geom {
+namespace geom {
 class Geometry;
 }
 
 class Scene;
-class Canvas;
 
 namespace _vis {
 
@@ -33,13 +28,10 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
     ~Visualizer();
 
     void add_scene(std::string name, std::shared_ptr<Scene> scene);
-    void add_canvas(std::string name, std::shared_ptr<Canvas> canvas);
 
     void delete_scene(std::string name);
-    void delete_canvas(std::string name);
 
     std::shared_ptr<Scene> scene(std::string name);
-    std::shared_ptr<Canvas> canvas(std::string name);
 
     void hang_forever();
 
@@ -48,12 +40,10 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
    private:
     void add_view(
         std::string name,
-        std::shared_ptr<_tree::Tree> tree,
-        slamd::flatb::ViewType type
+        std::shared_ptr<Scene> tree
     );
 
-
-    std::map<_id::GeometryID, std::shared_ptr<_geom::Geometry>> find_geometries(
+    std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> find_geometries(
     );
 
     void delete_view(std::string name);
@@ -65,7 +55,7 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
         flatbuffers::Vector<flatbuffers::Offset<flatb::Geometry>>>
     get_geometries_fb(flatbuffers::FlatBufferBuilder& builder);
 
-    void send_tree(std::shared_ptr<_tree::Tree> tree);
+    void send_tree(std::shared_ptr<Scene> tree);
 
    public:
     _id::VisualizerID id;
@@ -78,16 +68,23 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
 
     std::mutex view_map_mutex;
 
-    std::map<std::string, std::shared_ptr<_view::View>> view_name_to_view;
-    std::map<_id::TreeID, std::shared_ptr<_tree::Tree>> trees;
+    // NOTE: Declaration order matters for destruction!
+    // Members are destroyed in reverse declaration order.
+    // - io_context must outlive client_set, because Connections hold
+    //   asio sockets that deregister from the io_context on destruction.
+    // - trees must be declared before view_name_to_view so that views are
+    //   destroyed first. Otherwise, tree destruction during ~Visualizer
+    //   triggers node detach which reaches back into still-alive Views
+    //   whose weak_ptr<Visualizer> can no longer lock.
+    asio::io_context io_context;
     std::shared_ptr<_net::ClientSet> client_set;
+    std::map<_id::TreeID, std::shared_ptr<Scene>> trees;
+    std::map<std::string, std::shared_ptr<_view::View>> view_name_to_view;
 };
 
 }  // namespace _vis
 
-using VisualizerPtr = std::shared_ptr<_vis::Visualizer>;
-
-VisualizerPtr
+std::shared_ptr<_vis::Visualizer>
 visualizer(std::string name, bool spawn = true, uint16_t port = 5555);
 
 }  // namespace slamd

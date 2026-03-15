@@ -4,7 +4,7 @@
 #include <slamd/geom/geometry.hpp>
 
 namespace slamd {
-namespace _geom {
+namespace geom {
 
 /**
  * TODO: refactor to use MonoInstanced
@@ -33,13 +33,8 @@ class PointCloud : public Geometry {
     float min_brightness;
 };
 
-}  // namespace _geom
-
-namespace geom {
-using PointCloudPtr = std::shared_ptr<_geom::PointCloud>;
-
 template <typename ColorType, typename RadiiType>
-PointCloudPtr point_cloud(
+std::shared_ptr<PointCloud> point_cloud(
     const std::vector<glm::vec3>& positions,
     const ColorType& colors,
     const RadiiType& radii,
@@ -62,7 +57,7 @@ PointCloudPtr point_cloud(
         final_radii = radii;
     }
 
-    auto pc = std::make_shared<_geom::PointCloud>(
+    auto pc = std::make_shared<PointCloud>(
         positions,
         std::move(final_colors),
         std::move(final_radii),

@@ -1,15 +1,13 @@
 #include <slamd_window/geom/arrows.hpp>
+#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/box.hpp>
 #include <slamd_window/geom/camera_frustum.hpp>
-#include <slamd_window/geom/circles_2d.hpp>
 #include <slamd_window/geom/geometry.hpp>
 #include <slamd_window/geom/image.hpp>
 #include <slamd_window/geom/mesh.hpp>
 #include <slamd_window/geom/plane.hpp>
 #include <slamd_window/geom/point_cloud.hpp>
-#include <slamd_window/geom/points_2d.hpp>
 #include <slamd_window/geom/poly_line.hpp>
-#include <slamd_window/geom/poly_line_2d.hpp>
 #include <slamd_window/geom/sphere.hpp>
 #include <slamd_window/geom/triad.hpp>
 
@@ -23,9 +21,6 @@ std::shared_ptr<Geometry> Geometry::deserialize(
         case (slamd::flatb::GeometryUnion_triad): {
             return Triad::deserialize(geom_fb->geometry_as_triad());
         }
-        case (slamd::flatb::GeometryUnion_circles_2d): {
-            return Circles2D::deserialize(geom_fb->geometry_as_circles_2d());
-        }
         case (slamd::flatb::GeometryUnion_camera_frustum): {
             return CameraFrustum::deserialize(
                 geom_fb->geometry_as_camera_frustum()
@@ -36,9 +31,6 @@ std::shared_ptr<Geometry> Geometry::deserialize(
         }
         case (slamd::flatb::GeometryUnion_image): {
             return Image::deserialize(geom_fb->geometry_as_image());
-        }
-        case (slamd::flatb::GeometryUnion_points_2d): {
-            return Points2D::deserialize(geom_fb->geometry_as_points_2d());
         }
         case (slamd::flatb::GeometryUnion_box): {
             return Box::deserialize(geom_fb->geometry_as_box());
@@ -52,14 +44,14 @@ std::shared_ptr<Geometry> Geometry::deserialize(
         case (slamd::flatb::GeometryUnion_poly_line): {
             return PolyLine::deserialize(geom_fb->geometry_as_poly_line());
         }
-        case (slamd::flatb::GeometryUnion_poly_line_2d): {
-            return PolyLine2D::deserialize(geom_fb->geometry_as_poly_line_2d());
-        }
         case (slamd::flatb::GeometryUnion_mesh): {
             return Mesh::deserialize(geom_fb->geometry_as_mesh());
         }
         case (slamd::flatb::GeometryUnion_plane): {
             return Plane::deserialize(geom_fb->geometry_as_plane());
+        }
+        case (slamd::flatb::GeometryUnion_spheres): {
+            return Spheres::deserialize(geom_fb->geometry_as_spheres());
         }
         default: {
             throw std::runtime_error("Unknown geometry type");

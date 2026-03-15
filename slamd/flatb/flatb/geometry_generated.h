@@ -21,9 +21,6 @@ namespace flatb {
 struct Triad;
 struct TriadBuilder;
 
-struct Circles2D;
-struct Circles2DBuilder;
-
 struct CameraFrustum;
 struct CameraFrustumBuilder;
 
@@ -32,9 +29,6 @@ struct PointCloudBuilder;
 
 struct Image;
 struct ImageBuilder;
-
-struct Points2D;
-struct Points2DBuilder;
 
 struct Box;
 struct BoxBuilder;
@@ -48,11 +42,11 @@ struct ArrowsBuilder;
 struct PolyLine;
 struct PolyLineBuilder;
 
-struct PolyLine2D;
-struct PolyLine2DBuilder;
-
 struct Mesh;
 struct MeshBuilder;
+
+struct Spheres;
+struct SpheresBuilder;
 
 struct Plane;
 struct PlaneBuilder;
@@ -63,65 +57,59 @@ struct GeometryBuilder;
 enum GeometryUnion : uint8_t {
   GeometryUnion_NONE = 0,
   GeometryUnion_triad = 1,
-  GeometryUnion_circles_2d = 2,
-  GeometryUnion_camera_frustum = 3,
-  GeometryUnion_point_cloud = 4,
-  GeometryUnion_image = 5,
-  GeometryUnion_points_2d = 6,
-  GeometryUnion_box = 7,
-  GeometryUnion_sphere = 8,
-  GeometryUnion_arrows = 9,
-  GeometryUnion_poly_line = 10,
-  GeometryUnion_poly_line_2d = 11,
-  GeometryUnion_mesh = 12,
-  GeometryUnion_plane = 13,
+  GeometryUnion_camera_frustum = 2,
+  GeometryUnion_point_cloud = 3,
+  GeometryUnion_image = 4,
+  GeometryUnion_box = 5,
+  GeometryUnion_sphere = 6,
+  GeometryUnion_arrows = 7,
+  GeometryUnion_poly_line = 8,
+  GeometryUnion_mesh = 9,
+  GeometryUnion_plane = 10,
+  GeometryUnion_spheres = 11,
   GeometryUnion_MIN = GeometryUnion_NONE,
-  GeometryUnion_MAX = GeometryUnion_plane
+  GeometryUnion_MAX = GeometryUnion_spheres
 };
 
-inline const GeometryUnion (&EnumValuesGeometryUnion())[14] {
+inline const GeometryUnion (&EnumValuesGeometryUnion())[12] {
   static const GeometryUnion values[] = {
     GeometryUnion_NONE,
     GeometryUnion_triad,
-    GeometryUnion_circles_2d,
     GeometryUnion_camera_frustum,
     GeometryUnion_point_cloud,
     GeometryUnion_image,
-    GeometryUnion_points_2d,
     GeometryUnion_box,
     GeometryUnion_sphere,
     GeometryUnion_arrows,
     GeometryUnion_poly_line,
-    GeometryUnion_poly_line_2d,
     GeometryUnion_mesh,
-    GeometryUnion_plane
+    GeometryUnion_plane,
+    GeometryUnion_spheres
   };
   return values;
 }
 
 inline const char * const *EnumNamesGeometryUnion() {
-  static const char * const names[15] = {
+  static const char * const names[13] = {
     "NONE",
     "triad",
-    "circles_2d",
     "camera_frustum",
     "point_cloud",
     "image",
-    "points_2d",
     "box",
     "sphere",
     "arrows",
     "poly_line",
-    "poly_line_2d",
     "mesh",
     "plane",
+    "spheres",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameGeometryUnion(GeometryUnion e) {
-  if (::flatbuffers::IsOutRange(e, GeometryUnion_NONE, GeometryUnion_plane)) return "";
+  if (::flatbuffers::IsOutRange(e, GeometryUnion_NONE, GeometryUnion_spheres)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesGeometryUnion()[index];
 }
@@ -134,10 +122,6 @@ template<> struct GeometryUnionTraits<slamd::flatb::Triad> {
   static const GeometryUnion enum_value = GeometryUnion_triad;
 };
 
-template<> struct GeometryUnionTraits<slamd::flatb::Circles2D> {
-  static const GeometryUnion enum_value = GeometryUnion_circles_2d;
-};
-
 template<> struct GeometryUnionTraits<slamd::flatb::CameraFrustum> {
   static const GeometryUnion enum_value = GeometryUnion_camera_frustum;
 };
@@ -148,10 +132,6 @@ template<> struct GeometryUnionTraits<slamd::flatb::PointCloud> {
 
 template<> struct GeometryUnionTraits<slamd::flatb::Image> {
   static const GeometryUnion enum_value = GeometryUnion_image;
-};
-
-template<> struct GeometryUnionTraits<slamd::flatb::Points2D> {
-  static const GeometryUnion enum_value = GeometryUnion_points_2d;
 };
 
 template<> struct GeometryUnionTraits<slamd::flatb::Box> {
@@ -170,16 +150,16 @@ template<> struct GeometryUnionTraits<slamd::flatb::PolyLine> {
   static const GeometryUnion enum_value = GeometryUnion_poly_line;
 };
 
-template<> struct GeometryUnionTraits<slamd::flatb::PolyLine2D> {
-  static const GeometryUnion enum_value = GeometryUnion_poly_line_2d;
-};
-
 template<> struct GeometryUnionTraits<slamd::flatb::Mesh> {
   static const GeometryUnion enum_value = GeometryUnion_mesh;
 };
 
 template<> struct GeometryUnionTraits<slamd::flatb::Plane> {
   static const GeometryUnion enum_value = GeometryUnion_plane;
+};
+
+template<> struct GeometryUnionTraits<slamd::flatb::Spheres> {
+  static const GeometryUnion enum_value = GeometryUnion_spheres;
 };
 
 bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *obj, GeometryUnion type);
@@ -244,97 +224,6 @@ inline ::flatbuffers::Offset<Triad> CreateTriad(
   builder_.add_thickness(thickness);
   builder_.add_scale(scale);
   return builder_.Finish();
-}
-
-struct Circles2D FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef Circles2DBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POSITIONS = 4,
-    VT_COLORS = 6,
-    VT_RADII = 8,
-    VT_THICKNESS = 10
-  };
-  const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *positions() const {
-    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *>(VT_POSITIONS);
-  }
-  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *colors() const {
-    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_COLORS);
-  }
-  const ::flatbuffers::Vector<float> *radii() const {
-    return GetPointer<const ::flatbuffers::Vector<float> *>(VT_RADII);
-  }
-  float thickness() const {
-    return GetField<float>(VT_THICKNESS, 0.0f);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_POSITIONS) &&
-           verifier.VerifyVector(positions()) &&
-           VerifyOffset(verifier, VT_COLORS) &&
-           verifier.VerifyVector(colors()) &&
-           VerifyOffset(verifier, VT_RADII) &&
-           verifier.VerifyVector(radii()) &&
-           VerifyField<float>(verifier, VT_THICKNESS, 4) &&
-           verifier.EndTable();
-  }
-};
-
-struct Circles2DBuilder {
-  typedef Circles2D Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_positions(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> positions) {
-    fbb_.AddOffset(Circles2D::VT_POSITIONS, positions);
-  }
-  void add_colors(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors) {
-    fbb_.AddOffset(Circles2D::VT_COLORS, colors);
-  }
-  void add_radii(::flatbuffers::Offset<::flatbuffers::Vector<float>> radii) {
-    fbb_.AddOffset(Circles2D::VT_RADII, radii);
-  }
-  void add_thickness(float thickness) {
-    fbb_.AddElement<float>(Circles2D::VT_THICKNESS, thickness, 0.0f);
-  }
-  explicit Circles2DBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Circles2D> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Circles2D>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Circles2D> CreateCircles2D(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> positions = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<float>> radii = 0,
-    float thickness = 0.0f) {
-  Circles2DBuilder builder_(_fbb);
-  builder_.add_thickness(thickness);
-  builder_.add_radii(radii);
-  builder_.add_colors(colors);
-  builder_.add_positions(positions);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<Circles2D> CreateCircles2DDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<slamd::flatb::Vec2> *positions = nullptr,
-    const std::vector<slamd::flatb::Vec3> *colors = nullptr,
-    const std::vector<float> *radii = nullptr,
-    float thickness = 0.0f) {
-  auto positions__ = positions ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec2>(*positions) : 0;
-  auto colors__ = colors ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*colors) : 0;
-  auto radii__ = radii ? _fbb.CreateVector<float>(*radii) : 0;
-  return slamd::flatb::CreateCircles2D(
-      _fbb,
-      positions__,
-      colors__,
-      radii__,
-      thickness);
 }
 
 struct CameraFrustum FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -560,85 +449,6 @@ inline ::flatbuffers::Offset<Image> CreateImage(
   builder_.add_img(img);
   builder_.add_normalized(normalized);
   return builder_.Finish();
-}
-
-struct Points2D FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef Points2DBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POSITIONS = 4,
-    VT_COLORS = 6,
-    VT_RADII = 8
-  };
-  const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *positions() const {
-    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *>(VT_POSITIONS);
-  }
-  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *colors() const {
-    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_COLORS);
-  }
-  const ::flatbuffers::Vector<float> *radii() const {
-    return GetPointer<const ::flatbuffers::Vector<float> *>(VT_RADII);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_POSITIONS) &&
-           verifier.VerifyVector(positions()) &&
-           VerifyOffset(verifier, VT_COLORS) &&
-           verifier.VerifyVector(colors()) &&
-           VerifyOffset(verifier, VT_RADII) &&
-           verifier.VerifyVector(radii()) &&
-           verifier.EndTable();
-  }
-};
-
-struct Points2DBuilder {
-  typedef Points2D Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_positions(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> positions) {
-    fbb_.AddOffset(Points2D::VT_POSITIONS, positions);
-  }
-  void add_colors(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors) {
-    fbb_.AddOffset(Points2D::VT_COLORS, colors);
-  }
-  void add_radii(::flatbuffers::Offset<::flatbuffers::Vector<float>> radii) {
-    fbb_.AddOffset(Points2D::VT_RADII, radii);
-  }
-  explicit Points2DBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Points2D> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Points2D>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Points2D> CreatePoints2D(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> positions = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<float>> radii = 0) {
-  Points2DBuilder builder_(_fbb);
-  builder_.add_radii(radii);
-  builder_.add_colors(colors);
-  builder_.add_positions(positions);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<Points2D> CreatePoints2DDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<slamd::flatb::Vec2> *positions = nullptr,
-    const std::vector<slamd::flatb::Vec3> *colors = nullptr,
-    const std::vector<float> *radii = nullptr) {
-  auto positions__ = positions ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec2>(*positions) : 0;
-  auto colors__ = colors ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*colors) : 0;
-  auto radii__ = radii ? _fbb.CreateVector<float>(*radii) : 0;
-  return slamd::flatb::CreatePoints2D(
-      _fbb,
-      positions__,
-      colors__,
-      radii__);
 }
 
 struct Box FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -899,81 +709,6 @@ inline ::flatbuffers::Offset<PolyLine> CreatePolyLineDirect(
       min_brightness);
 }
 
-struct PolyLine2D FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef PolyLine2DBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POINTS = 4,
-    VT_COLOR = 6,
-    VT_THICKNESS = 8
-  };
-  const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *points() const {
-    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec2 *> *>(VT_POINTS);
-  }
-  const slamd::flatb::Vec3 *color() const {
-    return GetStruct<const slamd::flatb::Vec3 *>(VT_COLOR);
-  }
-  float thickness() const {
-    return GetField<float>(VT_THICKNESS, 0.0f);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_POINTS) &&
-           verifier.VerifyVector(points()) &&
-           VerifyField<slamd::flatb::Vec3>(verifier, VT_COLOR, 4) &&
-           VerifyField<float>(verifier, VT_THICKNESS, 4) &&
-           verifier.EndTable();
-  }
-};
-
-struct PolyLine2DBuilder {
-  typedef PolyLine2D Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_points(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> points) {
-    fbb_.AddOffset(PolyLine2D::VT_POINTS, points);
-  }
-  void add_color(const slamd::flatb::Vec3 *color) {
-    fbb_.AddStruct(PolyLine2D::VT_COLOR, color);
-  }
-  void add_thickness(float thickness) {
-    fbb_.AddElement<float>(PolyLine2D::VT_THICKNESS, thickness, 0.0f);
-  }
-  explicit PolyLine2DBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<PolyLine2D> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<PolyLine2D>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<PolyLine2D> CreatePolyLine2D(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec2 *>> points = 0,
-    const slamd::flatb::Vec3 *color = nullptr,
-    float thickness = 0.0f) {
-  PolyLine2DBuilder builder_(_fbb);
-  builder_.add_thickness(thickness);
-  builder_.add_color(color);
-  builder_.add_points(points);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<PolyLine2D> CreatePolyLine2DDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<slamd::flatb::Vec2> *points = nullptr,
-    const slamd::flatb::Vec3 *color = nullptr,
-    float thickness = 0.0f) {
-  auto points__ = points ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec2>(*points) : 0;
-  return slamd::flatb::CreatePolyLine2D(
-      _fbb,
-      points__,
-      color,
-      thickness);
-}
-
 struct Mesh FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef MeshBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -1024,6 +759,97 @@ inline ::flatbuffers::Offset<Mesh> CreateMesh(
   builder_.add_min_brightness(min_brightness);
   builder_.add_data(data);
   return builder_.Finish();
+}
+
+struct Spheres FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SpheresBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITIONS = 4,
+    VT_COLORS = 6,
+    VT_RADII = 8,
+    VT_MIN_BRIGHTNESS = 10
+  };
+  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *positions() const {
+    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_POSITIONS);
+  }
+  const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *colors() const {
+    return GetPointer<const ::flatbuffers::Vector<const slamd::flatb::Vec3 *> *>(VT_COLORS);
+  }
+  const ::flatbuffers::Vector<float> *radii() const {
+    return GetPointer<const ::flatbuffers::Vector<float> *>(VT_RADII);
+  }
+  float min_brightness() const {
+    return GetField<float>(VT_MIN_BRIGHTNESS, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_POSITIONS) &&
+           verifier.VerifyVector(positions()) &&
+           VerifyOffset(verifier, VT_COLORS) &&
+           verifier.VerifyVector(colors()) &&
+           VerifyOffset(verifier, VT_RADII) &&
+           verifier.VerifyVector(radii()) &&
+           VerifyField<float>(verifier, VT_MIN_BRIGHTNESS, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct SpheresBuilder {
+  typedef Spheres Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_positions(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> positions) {
+    fbb_.AddOffset(Spheres::VT_POSITIONS, positions);
+  }
+  void add_colors(::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors) {
+    fbb_.AddOffset(Spheres::VT_COLORS, colors);
+  }
+  void add_radii(::flatbuffers::Offset<::flatbuffers::Vector<float>> radii) {
+    fbb_.AddOffset(Spheres::VT_RADII, radii);
+  }
+  void add_min_brightness(float min_brightness) {
+    fbb_.AddElement<float>(Spheres::VT_MIN_BRIGHTNESS, min_brightness, 0.0f);
+  }
+  explicit SpheresBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Spheres> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Spheres>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Spheres> CreateSpheres(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> positions = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const slamd::flatb::Vec3 *>> colors = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<float>> radii = 0,
+    float min_brightness = 0.0f) {
+  SpheresBuilder builder_(_fbb);
+  builder_.add_min_brightness(min_brightness);
+  builder_.add_radii(radii);
+  builder_.add_colors(colors);
+  builder_.add_positions(positions);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Spheres> CreateSpheresDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<slamd::flatb::Vec3> *positions = nullptr,
+    const std::vector<slamd::flatb::Vec3> *colors = nullptr,
+    const std::vector<float> *radii = nullptr,
+    float min_brightness = 0.0f) {
+  auto positions__ = positions ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*positions) : 0;
+  auto colors__ = colors ? _fbb.CreateVectorOfStructs<slamd::flatb::Vec3>(*colors) : 0;
+  auto radii__ = radii ? _fbb.CreateVector<float>(*radii) : 0;
+  return slamd::flatb::CreateSpheres(
+      _fbb,
+      positions__,
+      colors__,
+      radii__,
+      min_brightness);
 }
 
 struct Plane FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1127,9 +953,6 @@ struct Geometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const slamd::flatb::Triad *geometry_as_triad() const {
     return geometry_type() == slamd::flatb::GeometryUnion_triad ? static_cast<const slamd::flatb::Triad *>(geometry()) : nullptr;
   }
-  const slamd::flatb::Circles2D *geometry_as_circles_2d() const {
-    return geometry_type() == slamd::flatb::GeometryUnion_circles_2d ? static_cast<const slamd::flatb::Circles2D *>(geometry()) : nullptr;
-  }
   const slamd::flatb::CameraFrustum *geometry_as_camera_frustum() const {
     return geometry_type() == slamd::flatb::GeometryUnion_camera_frustum ? static_cast<const slamd::flatb::CameraFrustum *>(geometry()) : nullptr;
   }
@@ -1138,9 +961,6 @@ struct Geometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const slamd::flatb::Image *geometry_as_image() const {
     return geometry_type() == slamd::flatb::GeometryUnion_image ? static_cast<const slamd::flatb::Image *>(geometry()) : nullptr;
-  }
-  const slamd::flatb::Points2D *geometry_as_points_2d() const {
-    return geometry_type() == slamd::flatb::GeometryUnion_points_2d ? static_cast<const slamd::flatb::Points2D *>(geometry()) : nullptr;
   }
   const slamd::flatb::Box *geometry_as_box() const {
     return geometry_type() == slamd::flatb::GeometryUnion_box ? static_cast<const slamd::flatb::Box *>(geometry()) : nullptr;
@@ -1154,14 +974,14 @@ struct Geometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const slamd::flatb::PolyLine *geometry_as_poly_line() const {
     return geometry_type() == slamd::flatb::GeometryUnion_poly_line ? static_cast<const slamd::flatb::PolyLine *>(geometry()) : nullptr;
   }
-  const slamd::flatb::PolyLine2D *geometry_as_poly_line_2d() const {
-    return geometry_type() == slamd::flatb::GeometryUnion_poly_line_2d ? static_cast<const slamd::flatb::PolyLine2D *>(geometry()) : nullptr;
-  }
   const slamd::flatb::Mesh *geometry_as_mesh() const {
     return geometry_type() == slamd::flatb::GeometryUnion_mesh ? static_cast<const slamd::flatb::Mesh *>(geometry()) : nullptr;
   }
   const slamd::flatb::Plane *geometry_as_plane() const {
     return geometry_type() == slamd::flatb::GeometryUnion_plane ? static_cast<const slamd::flatb::Plane *>(geometry()) : nullptr;
+  }
+  const slamd::flatb::Spheres *geometry_as_spheres() const {
+    return geometry_type() == slamd::flatb::GeometryUnion_spheres ? static_cast<const slamd::flatb::Spheres *>(geometry()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1177,10 +997,6 @@ template<> inline const slamd::flatb::Triad *Geometry::geometry_as<slamd::flatb:
   return geometry_as_triad();
 }
 
-template<> inline const slamd::flatb::Circles2D *Geometry::geometry_as<slamd::flatb::Circles2D>() const {
-  return geometry_as_circles_2d();
-}
-
 template<> inline const slamd::flatb::CameraFrustum *Geometry::geometry_as<slamd::flatb::CameraFrustum>() const {
   return geometry_as_camera_frustum();
 }
@@ -1191,10 +1007,6 @@ template<> inline const slamd::flatb::PointCloud *Geometry::geometry_as<slamd::f
 
 template<> inline const slamd::flatb::Image *Geometry::geometry_as<slamd::flatb::Image>() const {
   return geometry_as_image();
-}
-
-template<> inline const slamd::flatb::Points2D *Geometry::geometry_as<slamd::flatb::Points2D>() const {
-  return geometry_as_points_2d();
 }
 
 template<> inline const slamd::flatb::Box *Geometry::geometry_as<slamd::flatb::Box>() const {
@@ -1213,16 +1025,16 @@ template<> inline const slamd::flatb::PolyLine *Geometry::geometry_as<slamd::fla
   return geometry_as_poly_line();
 }
 
-template<> inline const slamd::flatb::PolyLine2D *Geometry::geometry_as<slamd::flatb::PolyLine2D>() const {
-  return geometry_as_poly_line_2d();
-}
-
 template<> inline const slamd::flatb::Mesh *Geometry::geometry_as<slamd::flatb::Mesh>() const {
   return geometry_as_mesh();
 }
 
 template<> inline const slamd::flatb::Plane *Geometry::geometry_as<slamd::flatb::Plane>() const {
   return geometry_as_plane();
+}
+
+template<> inline const slamd::flatb::Spheres *Geometry::geometry_as<slamd::flatb::Spheres>() const {
+  return geometry_as_spheres();
 }
 
 struct GeometryBuilder {
@@ -1270,10 +1082,6 @@ inline bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *o
       auto ptr = reinterpret_cast<const slamd::flatb::Triad *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case GeometryUnion_circles_2d: {
-      auto ptr = reinterpret_cast<const slamd::flatb::Circles2D *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
     case GeometryUnion_camera_frustum: {
       auto ptr = reinterpret_cast<const slamd::flatb::CameraFrustum *>(obj);
       return verifier.VerifyTable(ptr);
@@ -1284,10 +1092,6 @@ inline bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *o
     }
     case GeometryUnion_image: {
       auto ptr = reinterpret_cast<const slamd::flatb::Image *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case GeometryUnion_points_2d: {
-      auto ptr = reinterpret_cast<const slamd::flatb::Points2D *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case GeometryUnion_box: {
@@ -1306,16 +1110,16 @@ inline bool VerifyGeometryUnion(::flatbuffers::Verifier &verifier, const void *o
       auto ptr = reinterpret_cast<const slamd::flatb::PolyLine *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case GeometryUnion_poly_line_2d: {
-      auto ptr = reinterpret_cast<const slamd::flatb::PolyLine2D *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
     case GeometryUnion_mesh: {
       auto ptr = reinterpret_cast<const slamd::flatb::Mesh *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case GeometryUnion_plane: {
       auto ptr = reinterpret_cast<const slamd::flatb::Plane *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case GeometryUnion_spheres: {
+      auto ptr = reinterpret_cast<const slamd::flatb::Spheres *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
