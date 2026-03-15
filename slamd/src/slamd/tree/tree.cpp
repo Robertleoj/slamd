@@ -161,6 +161,14 @@ Scene::Scene()
     this->root = std::make_shared<_tree::Node>(this, _tree::TreePath());
 }
 
+Scene::~Scene() {
+    // Clear the node tree before implicit member destruction.
+    // Node::~Node() calls geometry->detach() which calls back into
+    // this->find_visualizers(). If we let implicit destruction happen,
+    // attached_to and other members may already be partially destroyed.
+    this->root.reset();
+}
+
 void Scene::clear(
     const std::string& path
 ) {

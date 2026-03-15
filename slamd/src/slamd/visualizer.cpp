@@ -17,21 +17,6 @@ Visualizer::Visualizer(
 )
     : port(port),
       name(name) {
-    // Pre-flight check: ensure port is available before starting server thread
-    try {
-        asio::io_context test_io;
-        asio::ip::tcp::acceptor test_acceptor(
-            test_io,
-            asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)
-        );
-    } catch (const asio::system_error&) {
-        throw std::runtime_error(
-            "Port " + std::to_string(port) + " is already in use. "
-            "Is another visualizer or process using this port? "
-            "Try a different port or stop the other process."
-        );
-    }
-
     this->client_set = std::make_shared<_net::ClientSet>();
 
     this->server_thread = std::thread(&Visualizer::server_job, this);
@@ -276,11 +261,11 @@ std::vector<uint8_t> Visualizer::get_state() {
 }
 
 void Visualizer::server_job() {
-    asio::io_context io;
-    asio::ip::tcp::acceptor acceptor(
-        io,
-        asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)
-    );
+    asio::ip::tcp::acceptor acceptor(this->io_context);
+    acceptor.open(asio::ip::tcp::v4());
+    acceptor.set_option(asio::socket_base::reuse_address(true));
+    acceptor.bind(asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
+    acceptor.listen();
 
     std::function<void(void)> accept_loop = [&]() {
         acceptor.async_accept([&](std::error_code ec,
@@ -302,10 +287,10 @@ void Visualizer::server_job() {
         while (!this->stop_requested) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        io.stop();  // tell io to bounce
+        this->io_context.stop();
     });
 
-    io.run();
+    this->io_context.run();
 
     stop_watcher.join();
 }

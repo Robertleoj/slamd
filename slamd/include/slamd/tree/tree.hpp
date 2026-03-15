@@ -77,6 +77,7 @@ class Node : public std::enable_shared_from_this<Node> {
 class Scene {
    public:
     Scene();
+    ~Scene();
 
     void set_object(
         const std::string& path,

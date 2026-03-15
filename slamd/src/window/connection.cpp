@@ -1,3 +1,4 @@
+#include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 #include <slamd_window/connection.hpp>
@@ -97,6 +98,7 @@ void Connection::job() {
             );
 
             this->messages.push(std::move(message));
+            glfwPostEmptyEvent();
 
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Error while reading from socket: {}", e.what());

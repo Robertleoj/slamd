@@ -68,9 +68,18 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
 
     std::mutex view_map_mutex;
 
-    std::map<std::string, std::shared_ptr<_view::View>> view_name_to_view;
-    std::map<_id::TreeID, std::shared_ptr<Scene>> trees;
+    // NOTE: Declaration order matters for destruction!
+    // Members are destroyed in reverse declaration order.
+    // - io_context must outlive client_set, because Connections hold
+    //   asio sockets that deregister from the io_context on destruction.
+    // - trees must be declared before view_name_to_view so that views are
+    //   destroyed first. Otherwise, tree destruction during ~Visualizer
+    //   triggers node detach which reaches back into still-alive Views
+    //   whose weak_ptr<Visualizer> can no longer lock.
+    asio::io_context io_context;
     std::shared_ptr<_net::ClientSet> client_set;
+    std::map<_id::TreeID, std::shared_ptr<Scene>> trees;
+    std::map<std::string, std::shared_ptr<_view::View>> view_name_to_view;
 };
 
 }  // namespace _vis

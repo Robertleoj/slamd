@@ -110,7 +110,7 @@ void run_window(
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwWaitEventsTimeout(0.1);
     }
 
     SPDLOG_INFO("Window closed!");
