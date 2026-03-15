@@ -51,7 +51,7 @@ def main():
     state = np.array([2.8, 0.0, 3.0, 0.0])  # high angles -> chaos
     dt = 0.002
     trail = []
-    max_trail = 500
+    max_trail = 200
 
     spheres = None
     arm_line = None
