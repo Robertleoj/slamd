@@ -73,11 +73,19 @@ void Connection::job() {
             }
         }
 
+        if (this->stop_requested) break;
+
         auto& socket = socket_opt.value();
 
         {
             std::lock_guard<std::mutex> lock(this->socket_mutex);
             this->active_socket = &socket;
+        }
+
+        if (this->stop_requested) {
+            std::lock_guard<std::mutex> lock(this->socket_mutex);
+            this->active_socket = nullptr;
+            break;
         }
 
         try {
@@ -107,7 +115,8 @@ void Connection::job() {
                 this->active_socket = nullptr;
             }
             connected = false;
-            socket.close();
+            std::error_code ec;
+            socket.close(ec);
             SPDLOG_INFO("Socket closed due to error.");
         }
     }

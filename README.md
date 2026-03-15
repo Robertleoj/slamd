@@ -1,119 +1,97 @@
-![](./images/logo.png)
+<img src="./images/logo.png" width="100%">
 
 ---
 
-![](./images/moving_mesh.gif) ![](./images/spiral.gif)
+<img src="./images/galaxy.gif" width="49%"> <img src="./images/lorenz_attractor.gif" width="49%">
 
-SlamDunk is a lightweight Python library for real-time 3D and 2D visualization, built on OpenGL and ImGui. `pip install`, write a few lines of Python, and you've got an interactive 3D viewer.
+<img src="./images/double_pendulum.gif" width="49%"> <img src="./images/moving_spheres.gif" width="49%">
+
+`slamd` is a 3D visualization library for Python. `pip install`, write a few lines, and you have a GPU-accelerated interactive 3D viewer. No event loops, no boilerplate — just set geometry and it shows up.
 
 ```bash
 pip install slamd
 ```
 
-**Why SlamDunk?**
+## Why slamd?
 
-- **Simple** — a few lines of Python gets you an interactive 3D viewer
-- **Real-time** — update geometry on the fly from your script
-- **Multi-window** — ImGui-powered docking, floating, and tabbed sub-windows
-- **Lightweight** — no heavy frameworks, just OpenGL under the hood
-- **Remote-capable** — optionally connect to a visualizer running on a remote machine
-- **Batteries included** — point clouds, meshes, camera frustums, 2D canvases, and more
+Most 3D visualization in Python is either painfully slow (matplotlib's 3D mode), or requires you to learn a massive framework. `slamd` is neither.
 
-# Quick Start
+- **Dead simple** — create a visualizer, set geometry, done. The viewer window spawns automatically in a separate process. No event loop, no main thread hijacking, no callbacks.
+- **Real 3D rendering** — GPU-accelerated OpenGL. Handles millions of points, animated meshes, and real geometry at interactive framerates. This is not a plot library pretending to do 3D.
+- **Pose tree** — objects live in a transform tree (like ROS TF or a scene graph). Set a parent transform and everything underneath moves. Makes articulated and hierarchical scenes trivial.
+- **The right primitives** — point clouds, meshes, camera frustums, triads, arrows, polylines, spheres, planes. The stuff you actually need when working with 3D data, robotics, or SLAM.
+
+## How is this different from Rerun?
+
+`slamd` is a **stateful viewer**, not a logging database. There's no append-only log, no timeline, no timestamps forced onto your data. You have a tree of geometry — you set objects, move them, delete them, and what you see is what's there right now.
+
+Rerun is powerful, but it's a big tool with a lot of concepts. `slamd` does one thing: show your geometry, right now, with minimal API surface. If you want a data recording platform with time-series scrubbing, use Rerun. If you want to throw some geometry on screen and look at it, use `slamd`.
+
+## Quick Start
 
 ```python
 import slamd
 
 vis = slamd.Visualizer("Hello world")
-
 scene = vis.scene("scene")
-
 scene.set_object("/origin", slamd.geom.Triad())
-
-vis.hang_forever()
 ```
 
-![](./images/hello_world.png)
+![](./images/hello_world.gif)
 
-# Multiple Scenes
+That's it. A window opens with an interactive 3D view.
 
-SlamDunk supports multiple sub-windows with ImGui docking. Each window can show its own scene.
+Objects live in a transform tree — move a parent and children follow:
 
 ```python
-import slamd
-import numpy as np
+scene.set_object("/robot/camera/frustum", slamd.geom.CameraFrustum(K, w, h, scale=0.2))
+scene.set_object("/robot/lidar/cloud", slamd.geom.PointCloud(pts, colors, point_size))
 
-vis = slamd.Visualizer("two windows")
-
-scene1 = vis.scene("scene 1")
-scene2 = vis.scene("scene 2")
-
-scene1.set_object("/box", slamd.geom.Box())
-
-scene2.set_object("/origin", slamd.geom.Triad())
-
-scene2.set_object("/ball", slamd.geom.Sphere(2.0))
-
-sphere_transform = np.identity(4, dtype=np.float32)
-sphere_transform[:, 3] = np.array([5.0, 1.0, 2.0, 1.0])
-
-scene2.set_transform("/ball", sphere_transform)
-
-vis.hang_forever()
+# Move the whole robot — camera and lidar come with it
+scene.set_transform("/robot", pose)
 ```
 
-![](./images/two_scenes.png)
+## Multiple Windows
 
-Windows are fully controllable — drag them around, make tabs, float them, or dock them to the sides.
+Create multiple scenes — each gets its own sub-window with ImGui docking. Drag, tab, float, or dock them however you like:
 
-# Remote Visualization
+```python
+vis = slamd.Visualizer("multi-view")
+scene1 = vis.scene("RGB camera")
+scene2 = vis.scene("point cloud")
 
-By default, everything runs locally and you don't need to think about networking. But if you're working on a remote server (e.g. a GPU box), you can run the viewer separately on your local machine:
-
-```bash
-slamd-window --port [port] --ip [ip]
+scene1.set_object("/frustum", slamd.geom.CameraFrustum(K, w, h, img, 1.0))
+scene2.set_object("/cloud", slamd.geom.PointCloud(pts, colors, 0.3, 0.5))
 ```
 
-Just pass `spawn=False` and `port=...` to `Visualizer` on the remote side.
+![](./images/two_windows.gif)
 
-# Supported Geometry
+## Geometry
 
-### 3D
-
-- Camera Frustums (with optional image) — `slamd.geom.CameraFrustum`
-- Arrows/Vectors — `slamd.geom.Arrows`
-- Arbitrary meshes — `slamd.geom.Mesh`
+- Point clouds — `slamd.geom.PointCloud`
+- Meshes — `slamd.geom.Mesh`
+- Camera frustums (with image) — `slamd.geom.CameraFrustum`
+- Arrows — `slamd.geom.Arrows`
+- Polylines — `slamd.geom.PolyLine`
+- Spheres — `slamd.geom.Sphere` / `slamd.geom.Spheres`
+- Triads — `slamd.geom.Triad`
 - Planes — `slamd.geom.Plane`
-- Point Clouds — `slamd.geom.PointCloud`
-- Piecewise linear curves — `slamd.geom.PolyLine`
-- Spheres — `slamd.geom.Sphere`
-- Triads/reference frames — `slamd.geom.Triad`
+- Boxes — `slamd.geom.Box`
 
-### 2D
+## Installation
 
-- Images — `slamd.geom2d.Image`
-- Points — `slamd.geom2d.Points`
-- Piecewise linear curves — `slamd.geom2d.PolyLine`
-- Circles — `slamd.geom2d.Circles`
-
-# Installation
-
-Wheels are available on [PyPi](https://pypi.org/project/slamd/) for Linux and macOS (Python >= 3.11):
+Wheels on [PyPI](https://pypi.org/project/slamd/) for Linux and macOS (Python >= 3.11):
 
 ```bash
 pip install slamd
 ```
 
-The only runtime dependency is `numpy >= 1.23`.
+Only runtime dependency is `numpy >= 1.23`.
 
-# Examples
+## Examples
 
-The [examples](./examples) directory has scripts demonstrating point clouds, meshes, camera frustums, 2D canvases, animations, and more.
+See [examples/](./examples) for the full set.
 
-# Contributions
-
-All contributions and feedback are welcome! See the [examples](./examples) to get a feel for the API, or open an issue if something's unclear.
-
-# License
+## License
 
 Apache 2.0 — see [LICENSE](./LICENSE).

@@ -111,10 +111,7 @@ struct type_caster<glm::mat3> {
 // vector<glm::vec3>
 template <>
 struct type_caster<std::vector<glm::vec3>> {
-    PYBIND11_TYPE_CASTER(
-        std::vector<glm::vec3>,
-        _("numpy.ndarray")
-    );
+    PYBIND11_TYPE_CASTER(std::vector<glm::vec3>, _("numpy.ndarray"));
 
     bool load(
         handle src,
@@ -344,7 +341,6 @@ void define_private_geom(
         slamd::geom::Image,
         slamd::geom::Geometry,
         std::shared_ptr<slamd::geom::Image>>(m, "Image");
-
 }
 
 void define_geom(
@@ -523,7 +519,7 @@ PYBIND11_MODULE(
     bindings,
     m
 ) {
-    m.doc() = "SlamDunk visualization library";
+    m.doc() = "slamd visualization library";
 
     py::class_<slamd::Scene, std::shared_ptr<slamd::Scene>>(m, "Scene")
         .def(py::init([]() {
@@ -578,5 +574,4 @@ PYBIND11_MODULE(
 
     auto geom = m.def_submodule("geom");
     define_geom(geom);
-
 }

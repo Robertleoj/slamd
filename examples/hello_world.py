@@ -6,5 +6,3 @@ if __name__ == "__main__":
     scene = vis.scene("scene")
 
     scene.set_object("/origin", slamd.geom.Triad())
-
-    vis.hang_forever()

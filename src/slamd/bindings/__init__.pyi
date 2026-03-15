@@ -1,5 +1,5 @@
 """
-SlamDunk visualization library
+slamd visualization library
 """
 from __future__ import annotations
 import numpy

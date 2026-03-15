@@ -1,7 +1,7 @@
 """
 Lorenz attractor — multiple trails tracing the strange attractor with color gradients.
 
-This is a fun math demo, not representative of typical SlamDunk usage.
+This is a fun math demo, not representative of typical slamd usage.
 See the other examples for more practical use cases.
 """
 
@@ -24,12 +24,12 @@ def rk4_step(state, dt, sigma=10.0, rho=28.0, beta=8 / 3):
 
 
 TRAIL_COLORS = [
-    (1.0, 0.3, 0.1),   # red-orange
-    (0.2, 0.7, 1.0),   # sky blue
+    (1.0, 0.3, 0.1),  # red-orange
+    (0.2, 0.7, 1.0),  # sky blue
     (1.0, 0.85, 0.1),  # gold
-    (0.4, 1.0, 0.5),   # mint green
-    (1.0, 0.4, 0.7),   # pink
-    (0.6, 0.4, 1.0),   # purple
+    (0.4, 1.0, 0.5),  # mint green
+    (1.0, 0.4, 0.7),  # pink
+    (0.6, 0.4, 1.0),  # purple
 ]
 
 
