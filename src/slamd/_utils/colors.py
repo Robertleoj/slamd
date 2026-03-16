@@ -1,5 +1,3 @@
-import numpy as np
-
 class Color:
     """Namespace for colors in RGB format.
 
@@ -27,6 +25,3 @@ class Color:
     dark_yellow = (128, 128, 0)
     dark_cyan = (0, 128, 128)
     dark_magenta = (128, 0, 128)
-
-
-

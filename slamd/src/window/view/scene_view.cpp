@@ -140,15 +140,11 @@ void SceneView::handle_mouse_input() {
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
 
             float scale = 1.0f / static_cast<float>(std::min(
-                this->frame_buffer.width(),
-                this->frame_buffer.height()
-            ));
+                                     this->frame_buffer.width(),
+                                     this->frame_buffer.height()
+                                 ));
 
-            glm::vec3 translation(
-                -delta.x * scale,
-                 delta.y * scale,
-                 0.0f
-            );
+            glm::vec3 translation(-delta.x * scale, delta.y * scale, 0.0f);
 
             this->arcball.translate_relative(translation);
             this->arcball_indicator.interact();

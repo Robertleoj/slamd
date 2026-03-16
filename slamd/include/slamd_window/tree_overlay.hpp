@@ -11,8 +11,8 @@ class TreeOverlay {
     TreeOverlay();
 
     /// Renders the tree overlay in the upper-left of the current ImGui window.
-    /// Returns true if the overlay modified tree state (checkbox toggled, filter
-    /// changed).
+    /// Returns true if the overlay modified tree state (checkbox toggled,
+    /// filter changed).
     bool render(std::shared_ptr<Tree> tree);
 
    private:

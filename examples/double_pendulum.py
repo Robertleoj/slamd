@@ -17,13 +17,17 @@ def derivs(state):
     sd, cd = np.sin(delta), np.cos(delta)
     den = 2 * M1 + M2 - M2 * np.cos(2 * delta)
 
-    a1 = (-G * (2 * M1 + M2) * np.sin(t1)
-           - M2 * G * np.sin(t1 - 2 * t2)
-           - 2 * sd * M2 * (w2**2 * L2 + w1**2 * L1 * cd)) / (L1 * den)
+    a1 = (
+        -G * (2 * M1 + M2) * np.sin(t1)
+        - M2 * G * np.sin(t1 - 2 * t2)
+        - 2 * sd * M2 * (w2**2 * L2 + w1**2 * L1 * cd)
+    ) / (L1 * den)
 
-    a2 = (2 * sd * (w1**2 * L1 * (M1 + M2)
-           + G * (M1 + M2) * np.cos(t1)
-           + w2**2 * L2 * M2 * cd)) / (L2 * den)
+    a2 = (
+        2
+        * sd
+        * (w1**2 * L1 * (M1 + M2) + G * (M1 + M2) * np.cos(t1) + w2**2 * L2 * M2 * cd)
+    ) / (L2 * den)
 
     return np.array([w1, a1, w2, a2])
 
@@ -54,8 +58,6 @@ def main():
     max_trail = 200
 
     spheres = None
-    arm_line = None
-    trail_line = None
 
     while True:
         for _ in range(10):
@@ -76,13 +78,19 @@ def main():
         else:
             spheres.update_positions(positions)
 
-        arm_pts = np.array([[0, 0, 0], [p1[0], 0, p1[1]], [p2[0], 0, p2[1]]], dtype=np.float32)
-        arm = slamd.geom.PolyLine(arm_pts, 0.04, np.array([0.9, 0.9, 0.9], dtype=np.float32), 0.5)
+        arm_pts = np.array(
+            [[0, 0, 0], [p1[0], 0, p1[1]], [p2[0], 0, p2[1]]], dtype=np.float32
+        )
+        arm = slamd.geom.PolyLine(
+            arm_pts, 0.04, np.array([0.9, 0.9, 0.9], dtype=np.float32), 0.5
+        )
         scene.set_object("/arm", arm)
 
         if len(trail) > 2:
             pts = np.array(trail, dtype=np.float32)
-            trail_obj = slamd.geom.PolyLine(pts, 0.02, np.array([1.0, 0.7, 0.1], dtype=np.float32), 0.3)
+            trail_obj = slamd.geom.PolyLine(
+                pts, 0.02, np.array([1.0, 0.7, 0.1], dtype=np.float32), 0.3
+            )
             scene.set_object("/trail", trail_obj)
 
         time.sleep(0.01)

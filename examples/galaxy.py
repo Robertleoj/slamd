@@ -12,7 +12,7 @@ def make_galaxy(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarra
 
     # Spiral disk
     r = rng.exponential(3.0, n_disk)
-    theta = rng.uniform(0, 2 * np.pi, n_disk)
+
     # Add spiral arm structure — stars cluster around 3 arms
     n_arms = 3
     arm = rng.integers(0, n_arms, n_disk)
@@ -30,11 +30,13 @@ def make_galaxy(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarra
     brightness = np.clip(0.5 + 0.5 * arm_phase, 0.2, 1.0)
     temp = np.clip(1.0 - r / 15.0, 0.0, 1.0)
 
-    disk_colors = np.column_stack([
-        0.9 * brightness + 0.1,
-        0.7 * brightness * temp + 0.3 * brightness,
-        0.9 * brightness * temp,
-    ])
+    disk_colors = np.column_stack(
+        [
+            0.9 * brightness + 0.1,
+            0.7 * brightness * temp + 0.3 * brightness,
+            0.9 * brightness * temp,
+        ]
+    )
 
     # Central bulge
     br = rng.exponential(0.8, n_bulge)
@@ -48,11 +50,13 @@ def make_galaxy(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarra
     bulge_pos = np.column_stack([bx, by, bz])
 
     bulge_brightness = np.clip(1.0 - br / 3.0, 0.3, 1.0)
-    bulge_colors = np.column_stack([
-        bulge_brightness,
-        bulge_brightness * 0.85,
-        bulge_brightness * 0.5,
-    ])
+    bulge_colors = np.column_stack(
+        [
+            bulge_brightness,
+            bulge_brightness * 0.85,
+            bulge_brightness * 0.5,
+        ]
+    )
 
     positions = np.concatenate([disk_pos, bulge_pos]).astype(np.float32)
     colors = np.concatenate([disk_colors, bulge_colors]).astype(np.float32)
@@ -70,8 +74,6 @@ def main():
 
     cloud = slamd.geom.PointCloud(positions, colors, 0.08, 0.7)
     scene.set_object("/galaxy", cloud)
-
-    vis.hang_forever()
 
 
 if __name__ == "__main__":

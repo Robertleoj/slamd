@@ -25,8 +25,6 @@ def main():
             f"/plane_{i}", slamd.geom.Plane(normal, pos, color, radius, alpha)
         )
 
-    vis.hang_forever()
-
 
 if __name__ == "__main__":
     main()

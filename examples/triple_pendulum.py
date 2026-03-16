@@ -35,24 +35,32 @@ def derivs(state):
     m33 = M3 * L3**2
 
     # Right-hand side: Coriolis / centrifugal + gravity terms.
-    f1 = (-(M2 + M3) * L1 * L2 * s12 * w2**2
-          - M3 * L1 * L3 * s13 * w3**2
-          - (M1 + M2 + M3) * G * L1 * np.sin(t1))
+    f1 = (
+        -(M2 + M3) * L1 * L2 * s12 * w2**2
+        - M3 * L1 * L3 * s13 * w3**2
+        - (M1 + M2 + M3) * G * L1 * np.sin(t1)
+    )
 
-    f2 = ((M2 + M3) * L1 * L2 * s12 * w1**2
-          - M3 * L2 * L3 * s23 * w3**2
-          - (M2 + M3) * G * L2 * np.sin(t2))
+    f2 = (
+        (M2 + M3) * L1 * L2 * s12 * w1**2
+        - M3 * L2 * L3 * s23 * w3**2
+        - (M2 + M3) * G * L2 * np.sin(t2)
+    )
 
-    f3 = (M3 * L1 * L3 * s13 * w1**2
-          + M3 * L2 * L3 * s23 * w2**2
-          - M3 * G * L3 * np.sin(t3))
+    f3 = (
+        M3 * L1 * L3 * s13 * w1**2
+        + M3 * L2 * L3 * s23 * w2**2
+        - M3 * G * L3 * np.sin(t3)
+    )
 
     # Solve M * [a1, a2, a3]^T = [f1, f2, f3]^T
-    M = np.array([
-        [m11, m12, m13],
-        [m12, m22, m23],
-        [m13, m23, m33],
-    ])
+    M = np.array(
+        [
+            [m11, m12, m13],
+            [m12, m22, m23],
+            [m13, m23, m33],
+        ]
+    )
     f = np.array([f1, f2, f3])
     a1, a2, a3 = np.linalg.solve(M, f)
 
@@ -98,16 +106,22 @@ def main():
         if len(trail) > max_trail:
             trail = trail[-max_trail:]
 
-        positions = np.array([
-            [p1[0], 0, p1[1]],
-            [p2[0], 0, p2[1]],
-            [p3[0], 0, p3[1]],
-        ], dtype=np.float32)
-        colors = np.array([
-            [1.0, 0.2, 0.1],
-            [0.2, 0.6, 1.0],
-            [0.1, 1.0, 0.3],
-        ], dtype=np.float32)
+        positions = np.array(
+            [
+                [p1[0], 0, p1[1]],
+                [p2[0], 0, p2[1]],
+                [p3[0], 0, p3[1]],
+            ],
+            dtype=np.float32,
+        )
+        colors = np.array(
+            [
+                [1.0, 0.2, 0.1],
+                [0.2, 0.6, 1.0],
+                [0.1, 1.0, 0.3],
+            ],
+            dtype=np.float32,
+        )
         radii = np.array([0.10, 0.10, 0.10], dtype=np.float32)
 
         if spheres is None:
@@ -116,18 +130,25 @@ def main():
         else:
             spheres.update_positions(positions)
 
-        arm_pts = np.array([
-            [0, 0, 0],
-            [p1[0], 0, p1[1]],
-            [p2[0], 0, p2[1]],
-            [p3[0], 0, p3[1]],
-        ], dtype=np.float32)
-        arm = slamd.geom.PolyLine(arm_pts, 0.03, np.array([0.9, 0.9, 0.9], dtype=np.float32), 0.5)
+        arm_pts = np.array(
+            [
+                [0, 0, 0],
+                [p1[0], 0, p1[1]],
+                [p2[0], 0, p2[1]],
+                [p3[0], 0, p3[1]],
+            ],
+            dtype=np.float32,
+        )
+        arm = slamd.geom.PolyLine(
+            arm_pts, 0.03, np.array([0.9, 0.9, 0.9], dtype=np.float32), 0.5
+        )
         scene.set_object("/arm", arm)
 
         if len(trail) > 2:
             pts = np.array(trail, dtype=np.float32)
-            trail_obj = slamd.geom.PolyLine(pts, 0.015, np.array([1.0, 0.7, 0.1], dtype=np.float32), 0.3)
+            trail_obj = slamd.geom.PolyLine(
+                pts, 0.015, np.array([1.0, 0.7, 0.1], dtype=np.float32), 0.3
+            )
             scene.set_object("/trail", trail_obj)
 
         time.sleep(0.01)

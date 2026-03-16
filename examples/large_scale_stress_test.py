@@ -32,8 +32,6 @@ def main():
         slamd.geom.PointCloud(points, colors, triad_size * 0.2),
     )
 
-    vis.hang_forever()
-
 
 if __name__ == "__main__":
     main()

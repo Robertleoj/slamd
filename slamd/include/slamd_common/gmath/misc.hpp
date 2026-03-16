@@ -12,7 +12,5 @@ glm::mat4 make_frame(
     const glm::vec3& translation
 );
 
-
-
 }  // namespace gmath
 }  // namespace slamd

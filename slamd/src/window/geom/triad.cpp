@@ -50,4 +50,4 @@ void Triad::render(
 }
 
 }  // namespace _geom
-}  // namespace slami
+}  // namespace slamd

@@ -78,6 +78,5 @@ def main():
             mesh.update_colors(colors)
 
 
-
 if __name__ == "__main__":
     main()

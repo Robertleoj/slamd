@@ -48,8 +48,7 @@ std::shared_ptr<Arrows> arrows(
     const std::vector<glm::vec3>& colors,
     float thickness
 ) {
-    auto arrows =
-        std::make_shared<Arrows>(starts, ends, colors, thickness);
+    auto arrows = std::make_shared<Arrows>(starts, ends, colors, thickness);
     // _global::geometries.add(arrows->id, arrows);
     return arrows;
 }

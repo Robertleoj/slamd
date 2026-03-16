@@ -40,8 +40,6 @@ def main():
     spheres = slamd.geom.Spheres(positions, colors, radii, 0.3)
     scene.set_object("/spheres", spheres)
 
-    input("Press Enter to exit...")
-
 
 if __name__ == "__main__":
     main()

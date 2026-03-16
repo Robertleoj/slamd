@@ -1,9 +1,9 @@
 #pragma once
 
 #include <asio.hpp>
+#include <mutex>
 #include <slamd_common/utils/thread_safe_queue.hpp>
 #include <slamd_window/message.hpp>
-#include <mutex>
 #include <thread>
 
 namespace slamd {

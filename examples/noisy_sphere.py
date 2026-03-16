@@ -31,7 +31,9 @@ def uv_sphere(subdivisions: int = 5) -> tuple[np.ndarray, list[int]]:
     return np.array(vertices, dtype=np.float32), indices
 
 
-def snoise(positions: np.ndarray, t: float, freq: float, speed: float, phase: float = 0.0) -> np.ndarray:
+def snoise(
+    positions: np.ndarray, t: float, freq: float, speed: float, phase: float = 0.0
+) -> np.ndarray:
     x, y, z = positions[:, 0], positions[:, 1], positions[:, 2]
     return (
         np.sin(freq * x + speed * t + phase)

@@ -5,9 +5,9 @@
 #include <memory>
 #include <slamd_common/gmath/serialization.hpp>
 #include <slamd_common/gmath/stringify.hpp>
-#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/mesh.hpp>
 #include <slamd_window/geom/point_cloud.hpp>
+#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/state_manager.hpp>
 #include <slamd_window/view/scene_view.hpp>
 

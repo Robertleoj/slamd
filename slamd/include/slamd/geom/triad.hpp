@@ -25,7 +25,8 @@ class Triad : public Geometry {
 };
 
 std::shared_ptr<Triad> triad(float scale = 1.0, float thickness = 0.1);
-std::shared_ptr<Triad> triad(glm::mat4 pose, float scale = 1.0, float thickness = 0.1);
+std::shared_ptr<Triad>
+triad(glm::mat4 pose, float scale = 1.0, float thickness = 0.1);
 
 }  // namespace geom
 }  // namespace slamd

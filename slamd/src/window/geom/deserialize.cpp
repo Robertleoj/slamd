@@ -1,5 +1,4 @@
 #include <slamd_window/geom/arrows.hpp>
-#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/box.hpp>
 #include <slamd_window/geom/camera_frustum.hpp>
 #include <slamd_window/geom/geometry.hpp>
@@ -9,6 +8,7 @@
 #include <slamd_window/geom/point_cloud.hpp>
 #include <slamd_window/geom/poly_line.hpp>
 #include <slamd_window/geom/sphere.hpp>
+#include <slamd_window/geom/spheres.hpp>
 #include <slamd_window/geom/triad.hpp>
 
 namespace slamd {

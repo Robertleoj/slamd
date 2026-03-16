@@ -45,12 +45,8 @@ std::shared_ptr<PolyLine> poly_line(
     const glm::vec3& color,
     float min_brightness
 ) {
-    auto poly_line = std::make_shared<PolyLine>(
-        points,
-        thickness,
-        color,
-        min_brightness
-    );
+    auto poly_line =
+        std::make_shared<PolyLine>(points, thickness, color, min_brightness);
     // _global::geometries.add(poly_line->id, poly_line);
     return poly_line;
 }

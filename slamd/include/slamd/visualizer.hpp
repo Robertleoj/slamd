@@ -1,6 +1,6 @@
 #pragma once
-#include <asio.hpp>
 #include <flatb/geometry_generated.h>
+#include <asio.hpp>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -38,10 +38,7 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
     void broadcast(std::shared_ptr<std::vector<uint8_t>> message_buffer);
 
    private:
-    void add_view(
-        std::string name,
-        std::shared_ptr<Scene> tree
-    );
+    void add_view(std::string name, std::shared_ptr<Scene> tree);
 
     std::map<_id::GeometryID, std::shared_ptr<geom::Geometry>> find_geometries(
     );

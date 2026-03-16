@@ -19,8 +19,6 @@ def main():
         scene.set_transform(pth, transform)
         scene.set_object(pth, slamd.geom.Box())
 
-    vis.hang_forever()
-
 
 if __name__ == "__main__":
     main()

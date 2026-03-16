@@ -1,5 +1,5 @@
-#include <functional>
 #include <imgui.h>
+#include <functional>
 #include <slamd_window/tree_overlay.hpp>
 
 namespace slamd {
@@ -256,11 +256,9 @@ void TreeOverlay::draw_node(
         float cx = right_edge_x - radius;
         float cy = 0.5f * (item_min.y + item_max.y);
 
-        ImU32 col_fill =
-            ImGui::GetColorU32(ImVec4(0.30f, 0.85f, 0.40f, 1.0f));
-        ImU32 col_line = ImGui::GetColorU32(
-            ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)
-        );
+        ImU32 col_fill = ImGui::GetColorU32(ImVec4(0.30f, 0.85f, 0.40f, 1.0f));
+        ImU32 col_line =
+            ImGui::GetColorU32(ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 
         ImDrawList* dl = ImGui::GetWindowDrawList();
         if (match) {

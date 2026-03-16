@@ -48,14 +48,7 @@ std::unique_ptr<MonoInstanced> Spheres::make_mono_instanced(
     std::vector<glm::vec3> normals;
     std::vector<uint32_t> indices;
 
-    slamd::_utils::generate_sphere(
-        vertices,
-        indices,
-        normals,
-        1.0f,
-        16,
-        16
-    );
+    slamd::_utils::generate_sphere(vertices, indices, normals, 1.0f, 16, 16);
 
     return std::make_unique<MonoInstanced>(
         vertices,
@@ -75,8 +68,7 @@ std::vector<glm::mat4> Spheres::make_transforms(
 
     for (std::size_t i = 0; i < positions.size(); ++i) {
         transforms.push_back(
-            slamd::gmath::t3D(positions[i]) *
-            slamd::gmath::scale_all(radii[i])
+            slamd::gmath::t3D(positions[i]) * slamd::gmath::scale_all(radii[i])
         );
     }
 

@@ -58,11 +58,13 @@ def populate_scene_wide(scene: slamd.Scene):
     for i in range(50):
         scene.set_object(
             f"/item_{i:03d}",
-            slamd.geom.Triad(make_transform(
-                (i % 10) * 3.0,
-                (i // 10) * 3.0,
-                0,
-            )),
+            slamd.geom.Triad(
+                make_transform(
+                    (i % 10) * 3.0,
+                    (i // 10) * 3.0,
+                    0,
+                )
+            ),
         )
 
     # A few nested groups
@@ -81,8 +83,6 @@ def main():
 
     populate_scene_deep(scene1)
     populate_scene_wide(scene2)
-
-    vis.hang_forever()
 
 
 if __name__ == "__main__":

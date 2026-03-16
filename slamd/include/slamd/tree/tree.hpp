@@ -79,10 +79,8 @@ class Scene {
     Scene();
     ~Scene();
 
-    void set_object(
-        const std::string& path,
-        std::shared_ptr<geom::Geometry> object
-    );
+    void
+    set_object(const std::string& path, std::shared_ptr<geom::Geometry> object);
 
     void set_transform(const std::string& path, const glm::mat4& transform);
 

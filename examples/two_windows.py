@@ -12,8 +12,8 @@ scene2 = vis.scene("point cloud")
 K = np.array([[500, 0, 320], [0, 500, 240], [0, 0, 1]], dtype=np.float64)
 w, h = 640, 480
 img = np.zeros((h, w, 3), dtype=np.uint8)
-img[:h // 2] = [140, 180, 230]   # sky
-img[h // 2:] = [80, 130, 60]     # ground
+img[: h // 2] = [140, 180, 230]  # sky
+img[h // 2 :] = [80, 130, 60]  # ground
 
 scene1.set_object("/origin", slamd.geom.Triad())
 scene1.set_object("/cam/frustum", slamd.geom.CameraFrustum(K, w, h, img, 0.8))
@@ -30,13 +30,15 @@ rng = np.random.default_rng(42)
 theta = rng.uniform(0, 2 * np.pi, n)
 r = rng.exponential(2.0, n)
 z = rng.normal(0, 0.5, n)
-positions = np.column_stack([r * np.cos(theta), r * np.sin(theta), z]).astype(np.float32)
+positions = np.column_stack([r * np.cos(theta), r * np.sin(theta), z]).astype(
+    np.float32
+)
 
-dist = np.sqrt(positions[:, 0]**2 + positions[:, 1]**2)
+dist = np.sqrt(positions[:, 0] ** 2 + positions[:, 1] ** 2)
 d = dist / dist.max()
-colors = np.column_stack([0.9 * d, 0.3 + 0.5 * (1 - d), 0.8 * (1 - d)]).astype(np.float32)
+colors = np.column_stack([0.9 * d, 0.3 + 0.5 * (1 - d), 0.8 * (1 - d)]).astype(
+    np.float32
+)
 
 scene2.set_object("/cloud", slamd.geom.PointCloud(positions, colors, 0.08, 0.6))
 scene2.set_object("/origin", slamd.geom.Triad())
-
-vis.hang_forever()

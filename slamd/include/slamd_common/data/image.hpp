@@ -6,7 +6,7 @@
 namespace slamd {
 namespace data {
 
-class  Image {
+class Image {
    public:
     Image();
     Image(

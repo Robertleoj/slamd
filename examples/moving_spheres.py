@@ -28,17 +28,17 @@ def main():
         # Calm concentric ripple
         z = 2.0 * np.sin(dist * 0.4 - t * 1.5) * np.exp(-dist * 0.03)
 
-        points = np.column_stack(
-            [coords[:, 0], coords[:, 1], z]
-        ).astype(np.float32)
+        points = np.column_stack([coords[:, 0], coords[:, 1], z]).astype(np.float32)
 
         # Smooth gradient: deep blue in troughs, warm orange on peaks
         h = (z - z.min()) / (z.max() - z.min() + 1e-8)
-        colors = np.column_stack([
-            h * 1.0,
-            h * 0.4 + 0.1,
-            (1.0 - h) * 0.8 + 0.2,
-        ]).astype(np.float32)
+        colors = np.column_stack(
+            [
+                h * 1.0,
+                h * 0.4 + 0.1,
+                (1.0 - h) * 0.8 + 0.2,
+            ]
+        ).astype(np.float32)
 
         # Radii: gentle swell that follows the ripple outward
         radii = (0.15 + 0.08 * np.sin(dist * 0.4 - t * 1.5)).astype(np.float32)

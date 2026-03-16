@@ -73,7 +73,9 @@ void Connection::job() {
             }
         }
 
-        if (this->stop_requested) break;
+        if (this->stop_requested) {
+            break;
+        }
 
         auto& socket = socket_opt.value();
 

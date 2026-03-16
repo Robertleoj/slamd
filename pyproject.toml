@@ -23,6 +23,8 @@ dev = [
     "pillow>=10.0",
     "pybind11>=2.13.6",
     "pybind11-stubgen>=2.5.3",
+    "pyright",
+    "ruff",
     "scikit-build-core>=0.10",
     "scipy>=1.15.2",
 ]
@@ -31,6 +33,12 @@ dev = [
 minimum-version = "build-system.requires"
 cmake.build-type = "MinSizeRel"
 build-dir = "build/{wheel_tag}"
+
+[tool.ruff]
+include = ["src/**/*.py", "examples/**/*.py", "tools/**/*.py"]
+
+[tool.pyright]
+include = ["src"]
 
 [tool.cibuildwheel]
 skip = ["*musllinux*", "*win*", "pp*"]

@@ -64,11 +64,13 @@ def main():
         angle_norm = (angle + np.pi) / (2 * np.pi)
         z_norm = np.clip((states[:, 2] + 1.5) / 3.0, 0, 1)
 
-        colors = np.column_stack([
-            0.9 * (0.5 + 0.5 * np.sin(angle_norm * 6.28 + 0.0)),
-            0.3 + 0.6 * z_norm,
-            0.9 * (0.5 + 0.5 * np.sin(angle_norm * 6.28 + 2.5)),
-        ]).astype(np.float32)
+        colors = np.column_stack(
+            [
+                0.9 * (0.5 + 0.5 * np.sin(angle_norm * 6.28 + 0.0)),
+                0.3 + 0.6 * z_norm,
+                0.9 * (0.5 + 0.5 * np.sin(angle_norm * 6.28 + 2.5)),
+            ]
+        ).astype(np.float32)
 
         radii = np.full(n, 0.025, dtype=np.float32)
 

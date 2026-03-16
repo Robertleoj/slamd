@@ -14,7 +14,6 @@ from .bindings import (
 )
 
 
-
 def _executable_path():
     executable_path = Path(__file__).parent / "slamd_window"
 
