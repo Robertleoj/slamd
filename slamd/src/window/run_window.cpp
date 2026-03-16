@@ -110,7 +110,20 @@ void run_window(
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwWaitEventsTimeout(0.1);
+
+        bool any_dirty = false;
+        for (auto& [name, view] : state_manager.views) {
+            if (view->_dirty) {
+                any_dirty = true;
+                break;
+            }
+        }
+
+        if (any_dirty) {
+            glfwPollEvents();
+        } else {
+            glfwWaitEventsTimeout(0.1);
+        }
     }
 
     SPDLOG_INFO("Window closed!");
