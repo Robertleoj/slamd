@@ -135,6 +135,26 @@ void SceneView::handle_mouse_input() {
             this->mark_dirty();
         }
 
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+            auto delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+
+            float scale = 1.0f / static_cast<float>(std::min(
+                this->frame_buffer.width(),
+                this->frame_buffer.height()
+            ));
+
+            glm::vec3 translation(
+                -delta.x * scale,
+                 delta.y * scale,
+                 0.0f
+            );
+
+            this->arcball.translate_relative(translation);
+            this->arcball_indicator.interact();
+            this->mark_dirty();
+        }
+
         if (io.MouseWheel != 0.0f) {
             auto scroll_input = static_cast<float>(io.MouseWheel);
 
