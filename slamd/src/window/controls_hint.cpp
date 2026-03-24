@@ -12,7 +12,7 @@ void ControlsHint::render() {
     };
 
     const HintLine lines[] = {
-        {"WASD / Right-drag", "Pan"},
+        {"WASDQE / Right-drag", "Pan"},
         {"Left-drag", "Rotate"},
         {"Scroll", "Zoom"},
         {".", "Re-center"},
