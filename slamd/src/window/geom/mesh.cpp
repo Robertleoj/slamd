@@ -9,6 +9,9 @@
 namespace slamd {
 namespace _geom {
 
+static bool s_peel_enabled = false;
+static uint32_t s_peel_depth_tex = 0;
+
 std::shared_ptr<Mesh> Mesh::deserialize(
     const slamd::flatb::Mesh* mesh_fb
 ) {
@@ -213,16 +216,11 @@ void Mesh::render(
     shader.set_uniform("projection", projection);
     shader.set_uniform("min_brightness", this->min_brightness);
     shader.set_uniform("alpha", this->mesh_data.alpha);
-
-    bool needs_blend = this->mesh_data.alpha < 1.0f;
-    gl::GLboolean blend_was_enabled = gl::GL_FALSE;
-    gl::GLboolean depth_mask_was_enabled = gl::GL_TRUE;
-    if (needs_blend) {
-        gl::glGetBooleanv(gl::GL_BLEND, &blend_was_enabled);
-        gl::glGetBooleanv(gl::GL_DEPTH_WRITEMASK, &depth_mask_was_enabled);
-        gl::glEnable(gl::GL_BLEND);
-        gl::glBlendFunc(gl::GL_SRC_ALPHA, gl::GL_ONE_MINUS_SRC_ALPHA);
-        gl::glDepthMask(gl::GL_FALSE);
+    shader.set_uniform("peel_enabled", s_peel_enabled);
+    if (s_peel_enabled) {
+        gl::glActiveTexture(gl::GL_TEXTURE0);
+        gl::glBindTexture(gl::GL_TEXTURE_2D, s_peel_depth_tex);
+        shader.set_uniform("peel_depth_tex", 0);
     }
 
     gl::glDrawElements(
@@ -232,15 +230,17 @@ void Mesh::render(
         0
     );
 
-    if (needs_blend) {
-        gl::glDepthMask(depth_mask_was_enabled);
-        if (blend_was_enabled == gl::GL_FALSE) {
-            gl::glDisable(gl::GL_BLEND);
-        }
-    }
-
     gl::glBindVertexArray(0);
 };
+
+bool Mesh::is_transparent() const {
+    return this->mesh_data.alpha < 1.0f;
+}
+
+void Mesh::set_peel_state(bool enabled, uint32_t depth_tex_id) {
+    s_peel_enabled = enabled;
+    s_peel_depth_tex = depth_tex_id;
+}
 
 Mesh::~Mesh() {
     gl::glDeleteBuffers(1, &eab_id);

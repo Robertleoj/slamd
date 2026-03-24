@@ -1,5 +1,6 @@
 import slamd
 import numpy as np
+import time
 
 
 def main():
@@ -39,6 +40,7 @@ def main():
 
     spheres = slamd.geom.Spheres(positions, colors, radii, 0.3)
     scene.set_object("/spheres", spheres)
+    time.sleep(10)
 
 
 if __name__ == "__main__":

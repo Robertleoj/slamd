@@ -1,6 +1,7 @@
 import slamd
 import numpy as np
 from itertools import combinations
+import time
 
 
 TAU = 2 * np.pi
@@ -139,6 +140,7 @@ def main():
     add_kn_on_torus(scene, 5, R, r, offset=(-spacing, 0, 0), path_prefix="/k5")
     add_kn_on_torus(scene, 6, R, r, offset=(0, 0, 0), path_prefix="/k6")
     add_kn_on_torus(scene, 7, R, r, offset=(spacing, 0, 0), path_prefix="/k7")
+    time.sleep(10)
 
 
 if __name__ == "__main__":

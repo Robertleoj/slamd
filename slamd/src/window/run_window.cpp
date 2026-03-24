@@ -96,6 +96,7 @@ void run_window(
                 if (scene->tree_overlay.render(scene->tree)) {
                     scene->mark_dirty();
                 }
+                scene->controls_hint.render();
 
                 ImGui::End();
                 ImGui::PopStyleVar();

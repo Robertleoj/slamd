@@ -18,12 +18,89 @@ std::shared_ptr<PolyLine> PolyLine::deserialize(
     );
 }
 
-std::unique_ptr<Mesh> make_poly_line_mesh(
+const float BEND_THRESHOLD = 0.85f;  // cos(~30°)
+
+// Insert arc-interpolated points at sharp bends so the tube rounds corners
+// instead of pinching or ballooning.
+std::vector<glm::vec3> subdivide_sharp_bends(
     const std::vector<glm::vec3>& points,
+    float radius
+) {
+    size_t n = points.size();
+    if (n < 3) {
+        return points;
+    }
+
+    // First pass: determine which interior points are sharp bends.
+    std::vector<bool> is_sharp(n, false);
+    for (size_t i = 1; i < n - 1; i++) {
+        glm::vec3 incoming = glm::normalize(points[i] - points[i - 1]);
+        glm::vec3 outgoing = glm::normalize(points[i + 1] - points[i]);
+        is_sharp[i] = glm::dot(incoming, outgoing) < BEND_THRESHOLD;
+    }
+
+    // Second pass: compute per-corner pullback so adjacent bends don't
+    // overlap. Each segment is shared by at most two corners (its start
+    // and end). Each corner gets at most half of each adjacent segment.
+    // If both ends of a segment are sharp, each gets a quarter.
+    std::vector<float> pullback(n, 0.0f);
+    for (size_t i = 1; i < n - 1; i++) {
+        if (!is_sharp[i]) continue;
+
+        float seg_before = glm::length(points[i] - points[i - 1]);
+        float seg_after = glm::length(points[i + 1] - points[i]);
+
+        float budget_before =
+            seg_before * (is_sharp[i - 1] ? 0.25f : 0.5f);
+        float budget_after =
+            seg_after * ((i + 1 < n - 1 && is_sharp[i + 1]) ? 0.25f : 0.5f);
+
+        pullback[i] =
+            glm::min(radius * 2.0f, glm::min(budget_before, budget_after));
+    }
+
+    // Third pass: emit points with Bezier arcs at sharp bends.
+    std::vector<glm::vec3> result;
+    result.push_back(points[0]);
+
+    for (size_t i = 1; i < n - 1; i++) {
+        if (!is_sharp[i]) {
+            result.push_back(points[i]);
+            continue;
+        }
+
+        glm::vec3 incoming = glm::normalize(points[i] - points[i - 1]);
+        glm::vec3 outgoing = glm::normalize(points[i + 1] - points[i]);
+        float cos_angle = glm::dot(incoming, outgoing);
+
+        glm::vec3 p_in = points[i] - incoming * pullback[i];
+        glm::vec3 p_out = points[i] + outgoing * pullback[i];
+
+        int steps = glm::clamp(
+            static_cast<int>((1.0f - cos_angle) * 5.0f), 2, 8
+        );
+
+        for (int s = 0; s <= steps; s++) {
+            float t = static_cast<float>(s) / static_cast<float>(steps);
+            glm::vec3 a = glm::mix(p_in, points[i], t);
+            glm::vec3 b = glm::mix(points[i], p_out, t);
+            result.push_back(glm::mix(a, b, t));
+        }
+    }
+
+    result.push_back(points.back());
+    return result;
+}
+
+std::unique_ptr<Mesh> make_poly_line_mesh(
+    const std::vector<glm::vec3>& input_points,
     float thickness,
     const glm::vec3& color,
     float min_brightness
 ) {
+    const auto points =
+        subdivide_sharp_bends(input_points, thickness * 0.5f);
+
     std::vector<glm::vec3> verts;
     std::vector<uint32_t> indices;
 
@@ -42,7 +119,9 @@ std::unique_ptr<Mesh> make_poly_line_mesh(
 
     for (size_t i = 0; i < points.size(); i++) {
         glm::vec3 forward;
-        if (i == points.size() - 1) {
+        if (i == 0) {
+            forward = glm::normalize(points[1] - points[0]);
+        } else if (i == points.size() - 1) {
             forward = glm::normalize(points[i] - points[i - 1]);
         } else {
             forward = glm::normalize(points[i + 1] - points[i]);

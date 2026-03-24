@@ -107,6 +107,7 @@ target_sources(
         src/window/frame_timer.cpp
         src/window/run_window.cpp
         src/window/tree_overlay.cpp
+        src/window/controls_hint.cpp
         src/window/state_manager.cpp
         src/window/connection.cpp
         src/window/message.cpp

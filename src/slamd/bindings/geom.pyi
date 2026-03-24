@@ -27,7 +27,9 @@ def Arrows(
     Create an Arrows geometry
     """
 
-def Box() -> slamd.bindings._geom_types.Box:
+def Box(
+    dims: numpy.ndarray = ..., color: numpy.ndarray = ...
+) -> slamd.bindings._geom_types.Box:
     """
     Create a Box geometry
     """
@@ -66,6 +68,20 @@ def Mesh(
 ) -> slamd.bindings._geom_types.Mesh:
     """
     Create a SimpleMesh geometry from raw data
+    """
+
+@typing.overload
+def Mesh(
+    vertices: numpy.ndarray,
+    vertex_colors: numpy.ndarray,
+    triangle_indices: collections.abc.Sequence[
+        typing.SupportsInt | typing.SupportsIndex
+    ],
+    vertex_normals: numpy.ndarray,
+    alpha: typing.SupportsFloat | typing.SupportsIndex,
+) -> slamd.bindings._geom_types.Mesh:
+    """
+    Create a SimpleMesh geometry from raw data with transparency
     """
 
 def Plane(

@@ -1,5 +1,6 @@
 import slamd
 import numpy as np
+import time
 
 
 def main():
@@ -24,6 +25,7 @@ def main():
         scene.set_object(
             f"/plane_{i}", slamd.geom.Plane(normal, pos, color, radius, alpha)
         )
+    time.sleep(10)
 
 
 if __name__ == "__main__":

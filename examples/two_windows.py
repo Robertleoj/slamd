@@ -2,6 +2,7 @@
 
 import slamd
 import numpy as np
+import time
 
 vis = slamd.Visualizer("Two Windows")
 
@@ -42,3 +43,4 @@ colors = np.column_stack([0.9 * d, 0.3 + 0.5 * (1 - d), 0.8 * (1 - d)]).astype(
 
 scene2.set_object("/cloud", slamd.geom.PointCloud(positions, colors, 0.08, 0.6))
 scene2.set_object("/origin", slamd.geom.Triad())
+time.sleep(10)

@@ -2,6 +2,7 @@
 #include <spdlog/spdlog.h>
 #include <slamd_common/gmath/angle.hpp>
 #include <slamd_common/numbers.hpp>
+#include <slamd_window/geom/mesh.hpp>
 #include <slamd_window/view/scene_view.hpp>
 
 namespace slamd {
@@ -22,7 +23,7 @@ SceneView::SceneView(
 )
     : tree(std::move(tree)),
       frame_buffer(500, 500),
-      camera(45.0, 0.001, 100.0),
+      camera(45.0, 0.05, 100.0),
       xy_grid(1000.0) {
     this->xy_grid.set_arcball_zoom(this->arcball.radius);
     this->arcball_indicator.set_arcball_zoom(this->arcball.radius);
@@ -53,43 +54,73 @@ void SceneView::render_to_imgui() {
 }
 
 void SceneView::render_to_frame_buffer() {
-    this->frame_buffer.bind();
-
     auto view = this->arcball.view_matrix();
     auto background_color = make_background_color(view);
-
-    gl::glEnable(gl::GL_BLEND);
-    gl::glBlendFunc(gl::GL_SRC_ALPHA, gl::GL_ONE_MINUS_SRC_ALPHA);
-
-    gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
-    gl::glEnable(gl::GL_DEPTH_TEST);
-
-    gl::glClearColor(
-        background_color.r,
-        background_color.g,
-        background_color.b,
-        1.0f
-    );
-    gl::glClear(gl::GL_COLOR_BUFFER_BIT);
-
     auto projection = this->camera.get_projection_matrix(
         this->frame_buffer.aspect(),
         this->arcball.radius
     );
 
-    this->tree->render(view, projection);
+    // === Pass 1: Opaque geometry to MSAA FBO ===
+    this->frame_buffer.bind();
+    gl::glEnable(gl::GL_DEPTH_TEST);
+    gl::glDepthMask(gl::GL_TRUE);
+    gl::glDisable(gl::GL_BLEND);
+    gl::glClearColor(
+        background_color.r, background_color.g, background_color.b, 1.0f
+    );
+    gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
-    this->xy_grid.render(glm::mat4(1.0), view, projection);
+    this->tree->render_opaque(view, projection);
     this->arcball_indicator.render(this->arcball.center, view, projection);
+
+    // Grid renders in MSAA pass with its own alpha blending
+    if (this->show_grid) {
+        gl::glEnable(gl::GL_BLEND);
+        gl::glBlendFunc(gl::GL_SRC_ALPHA, gl::GL_ONE_MINUS_SRC_ALPHA);
+        this->xy_grid.render(glm::mat4(1.0), view, projection);
+        gl::glDisable(gl::GL_BLEND);
+    }
 
     this->frame_buffer.unbind();
     this->frame_buffer.resolve();
+
+    // === Pass 2: Depth peeling for transparent geometry ===
+    int num_layers = 0;
+    for (int layer = 0; layer < 4; layer++) {
+        this->frame_buffer.bind_peel_pass();
+
+        // Re-render opaques depth-only to establish occlusion
+        gl::glColorMask(gl::GL_FALSE, gl::GL_FALSE, gl::GL_FALSE, gl::GL_FALSE);
+        this->tree->render_opaque(view, projection);
+        gl::glColorMask(gl::GL_TRUE, gl::GL_TRUE, gl::GL_TRUE, gl::GL_TRUE);
+
+        // Set peel discard for layers > 0
+        if (layer > 0) {
+            uint32_t prev_depth = this->frame_buffer.prev_peel_depth_texture();
+            _geom::Mesh::set_peel_state(true, prev_depth);
+        }
+
+        this->tree->render_transparent(view, projection);
+
+        _geom::Mesh::set_peel_state(false);
+
+        this->frame_buffer.end_peel_pass(layer);
+        num_layers = layer + 1;
+    }
+
+    // === Pass 3: Composite layers back-to-front ===
+    this->frame_buffer.composite_peel(num_layers);
 }
 
 void SceneView::handle_input() {
     if (ImGui::IsWindowFocused()) {
         this->handle_mouse_input();
         this->handle_translation_input();
+        if (ImGui::IsKeyPressed(ImGuiKey_G, false)) {
+            this->show_grid = !this->show_grid;
+            this->mark_dirty();
+        }
         if (ImGui::IsKeyPressed(ImGuiKey_Period, false)) {
             this->arcball.reset();
             this->xy_grid.set_arcball_zoom(this->arcball.radius);

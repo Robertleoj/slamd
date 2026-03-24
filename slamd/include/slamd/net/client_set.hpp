@@ -12,6 +12,7 @@ class ClientSet {
     void add(std::shared_ptr<Connection> conn);
     void broadcast(std::vector<uint8_t>&& msg);
     void broadcast(std::shared_ptr<std::vector<uint8_t>> msg);
+    void clear();
 
    private:
     void clean();

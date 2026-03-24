@@ -141,6 +141,7 @@ GridXYPlane::~GridXYPlane() {
     gl::glDeleteVertexArrays(1, &this->vao_id);
 }
 
+
 void GridXYPlane::set_arcball_zoom(
     float zoom
 ) {

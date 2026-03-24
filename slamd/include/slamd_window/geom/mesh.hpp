@@ -32,6 +32,9 @@ class Mesh : public Geometry {
     static std::shared_ptr<Mesh> deserialize(const slamd::flatb::Mesh* mesh_fb);
 
     void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;
+    bool is_transparent() const override;
+
+    static void set_peel_state(bool enabled, uint32_t depth_tex_id = 0);
 
     void update_positions(const std::vector<glm::vec3>& positions);
     void update_colors(const std::vector<glm::vec3>& colors);

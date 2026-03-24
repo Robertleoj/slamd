@@ -6,6 +6,7 @@
 #include <slamd_window/geom/arcball_indicator.hpp>
 #include <slamd_window/geom/xy_grid.hpp>
 #include <slamd_window/tree/tree.hpp>
+#include <slamd_window/controls_hint.hpp>
 #include <slamd_window/tree_overlay.hpp>
 
 namespace slamd {
@@ -20,12 +21,14 @@ class SceneView {
     bool _dirty = true;
     std::shared_ptr<Tree> tree;
     TreeOverlay tree_overlay;
+    ControlsHint controls_hint;
 
    private:
     FrameBuffer frame_buffer;
     Arcball arcball;
     Camera camera;
     FrameTimer frame_timer;
+    bool show_grid = true;
     _geom::GridXYPlane xy_grid;
     _geom::ArcballIndicator arcball_indicator;
 

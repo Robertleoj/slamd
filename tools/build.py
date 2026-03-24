@@ -67,6 +67,14 @@ def main():
         check=True,
     )
 
+    stubs_dir = REPO_DIR / "src" / "slamd" / "bindings"
+    stub_files = list(stubs_dir.glob("*.pyi"))
+    if stub_files:
+        print("\n=== Formatting and fixing stubs with ruff ===")
+        stub_paths = [str(f) for f in stub_files]
+        subprocess.run(["ruff", "check", "--fix"] + stub_paths, cwd=REPO_DIR, check=True)
+        subprocess.run(["ruff", "format"] + stub_paths, cwd=REPO_DIR, check=True)
+
     print("\n=== Done ===")
 
 

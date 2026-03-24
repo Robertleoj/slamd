@@ -28,7 +28,10 @@ table Image {
     normalized: bool;
 }
 
-table Box {}
+table Box {
+    dims: Vec3;
+    color: Vec3;
+}
 
 table Sphere {
     radius: float;

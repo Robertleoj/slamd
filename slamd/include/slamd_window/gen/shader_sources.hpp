@@ -95,8 +95,15 @@ out vec4 FragColor;
 uniform mat4 view;
 uniform float min_brightness;
 uniform float alpha;
+uniform bool peel_enabled;
+uniform sampler2D peel_depth_tex;
 
 void main() {
+    if (peel_enabled) {
+        float prev_depth = texelFetch(peel_depth_tex, ivec2(gl_FragCoord.xy), 0).r;
+        if (gl_FragCoord.z <= prev_depth) discard;
+    }
+
     vec3 norm = normalize(Normal);
 
     // Camera-relative lighting: extract camera forward and right from view matrix
@@ -188,6 +195,32 @@ void main() {
 } )";
 }  // namespace mono_instanced
 
+namespace peel_composite {
+inline const std::string vert = R"( #version 330 core
+
+layout(location = 0) in vec2 a_pos;
+layout(location = 1) in vec2 a_uv;
+
+out vec2 uv;
+
+void main() {
+    uv = a_uv;
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+}
+ )";
+inline const std::string frag = R"( #version 330 core
+
+in vec2 uv;
+out vec4 FragColor;
+
+uniform sampler2D layer_texture;
+
+void main() {
+    FragColor = texture(layer_texture, uv);
+}
+ )";
+}  // namespace peel_composite
+
 namespace point_cloud {
 inline const std::string vert = R"( #version 330 core
 
@@ -263,5 +296,5 @@ void main() {
  )";
 }  // namespace xy_grid
 
-}  // namespace shader_source
+}  // namespace shaders
 }  // namespace slamd

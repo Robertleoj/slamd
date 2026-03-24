@@ -35,6 +35,8 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
 
     void hang_forever();
 
+    void stop();
+
     void broadcast(std::shared_ptr<std::vector<uint8_t>> message_buffer);
 
    private:
@@ -61,7 +63,6 @@ class Visualizer : public std::enable_shared_from_this<Visualizer> {
     const uint16_t port;
     const std::string name;
     std::thread server_thread;
-    std::atomic<bool> stop_requested = false;
 
     std::mutex view_map_mutex;
 

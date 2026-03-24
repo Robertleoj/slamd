@@ -2,6 +2,7 @@
 
 import slamd
 import numpy as np
+import time
 
 
 def make_transform(x: float, y: float, z: float) -> np.ndarray:
@@ -45,7 +46,7 @@ def populate_scene_deep(scene: slamd.Scene):
     for cat in categories:
         for j in range(5):
             path = f"/{cat}/unit_{j}/geometry"
-            scene.set_object(path, slamd.geom.Box())
+            scene.set_object(path, slamd.geom.Box(np.array([1.5, 1.5, 1.5], dtype=np.float32), np.array([0.3, 0.6, 0.9], dtype=np.float32)))
             scene.set_transform(
                 path,
                 make_transform(j * 2.0, -5.0 - categories.index(cat) * 3.0, 0),
@@ -83,6 +84,7 @@ def main():
 
     populate_scene_deep(scene1)
     populate_scene_wide(scene2)
+    time.sleep(10)
 
 
 if __name__ == "__main__":
