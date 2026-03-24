@@ -1,6 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
+import atexit
 import threading
+import weakref
 import subprocess
 from sys import argv
 from . import geom
@@ -40,6 +42,16 @@ class Visualizer:
 
         if spawn:
             spawn_window(port)
+
+        impl_ref = weakref.ref(self._impl)
+        def _stop_if_alive():
+            impl = impl_ref()
+            if impl is not None:
+                impl.stop()
+        atexit.register(_stop_if_alive)
+
+    def __del__(self):
+        self._impl.stop()
 
     def hang_forever(self):
         """Block execution forever (used to keep the visualizer alive)."""

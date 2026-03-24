@@ -45,5 +45,10 @@ void ClientSet::broadcast(
     }
 }
 
+void ClientSet::clear() {
+    std::scoped_lock l(this->client_mutex);
+    this->clients.clear();
+}
+
 }  // namespace _net
 }  // namespace slamd

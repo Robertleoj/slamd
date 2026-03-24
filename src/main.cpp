@@ -560,7 +560,8 @@ PYBIND11_MODULE(
             py::arg("scene")
         )
         .def("scene", &slamd::_vis::Visualizer::scene, py::arg("name"))
-        .def("delete_scene", &slamd::_vis::Visualizer::delete_scene);
+        .def("delete_scene", &slamd::_vis::Visualizer::delete_scene)
+        .def("stop", &slamd::_vis::Visualizer::stop);
 
     m.def(
         "spawn_window",

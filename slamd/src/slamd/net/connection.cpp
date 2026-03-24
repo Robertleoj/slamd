@@ -1,4 +1,5 @@
 #include <spdlog/spdlog.h>
+#include <sys/socket.h>
 #include <chrono>
 #include <slamd/net/connection.hpp>
 
@@ -11,6 +12,13 @@ bool Connection::is_alive() {
 
 Connection::~Connection() {
     this->stop_requested = true;
+    // Use OS-level shutdown to unblock any pending asio::write on the worker
+    // thread. We avoid calling ASIO socket methods here because they are not
+    // thread-safe with concurrent operations on the worker.
+    auto handle = this->socket.native_handle();
+    if (handle >= 0) {
+        ::shutdown(handle, SHUT_RDWR);
+    }
     if (this->worker.joinable()) {
         this->worker.join();
     }

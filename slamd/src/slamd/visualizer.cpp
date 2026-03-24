@@ -270,36 +270,32 @@ void Visualizer::server_job() {
     std::function<void(void)> accept_loop = [&]() {
         acceptor.async_accept([&](std::error_code ec,
                                   asio::ip::tcp::socket socket) {
-            if (!ec) {
-                auto conn =
-                    std::make_shared<_net::Connection>(std::move(socket));
-                conn->write(this->get_state());
-                this->client_set->add(conn);
+            if (ec) {
+                return;
             }
-            accept_loop();  // keep accepting
+            auto conn =
+                std::make_shared<_net::Connection>(std::move(socket));
+            conn->write(this->get_state());
+            this->client_set->add(conn);
+            accept_loop();
         });
     };
 
     accept_loop();
 
-    // Spin a thread to cancel io when stop is requested
-    std::thread stop_watcher([&]() {
-        while (!this->stop_requested) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-        this->io_context.stop();
-    });
-
     this->io_context.run();
-
-    stop_watcher.join();
 }
 
 Visualizer::~Visualizer() {
-    this->stop_requested = true;
+    this->stop();
+}
+
+void Visualizer::stop() {
+    this->io_context.stop();
     if (this->server_thread.joinable()) {
         this->server_thread.join();
     }
+    this->client_set->clear();
 }
 
 void Visualizer::hang_forever() {
