@@ -263,5 +263,5 @@ void main() {
  )";
 }  // namespace xy_grid
 
-}  // namespace shader_source
+}  // namespace shaders
 }  // namespace slamd
