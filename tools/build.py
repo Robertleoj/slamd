@@ -34,6 +34,7 @@ def main():
             "install",
             "--force-reinstall",
             "--no-build-isolation",
+            "--verbose",
             "-e",
             ".",
         ],

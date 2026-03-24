@@ -12,6 +12,7 @@ class TreePath {
     bool is_root() const;
     TreePath parent() const;
     std::string string() const;
+    TreePath(const TreePath&) = default;
     TreePath& operator=(const TreePath&) = default;
     bool matches_glob(const TreePath& glob_path);
 

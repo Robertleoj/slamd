@@ -15,7 +15,7 @@ PointCloud::PointCloud(
     const std::vector<glm::vec3>& positions,
     const std::vector<glm::vec3>& colors,
     const std::vector<float>& radii,
-    float min_brightness
+    float /*min_brightness*/
 )
     : shader(
           shader_source::point_cloud::vert,
@@ -26,8 +26,7 @@ PointCloud::PointCloud(
       colors(colors),
       pending_colors_update(false),
       radii(radii),
-      pending_radii_update(false),
-      min_brightness(min_brightness) {
+      pending_radii_update(false) {
     if (!((positions.size() == colors.size()) && (colors.size() == radii.size())
         )) {
         throw std::invalid_argument(fmt::format(

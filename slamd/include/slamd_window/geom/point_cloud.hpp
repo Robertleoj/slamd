@@ -62,7 +62,6 @@ class PointCloud : public Geometry {
     std::vector<float> radii;
     bool pending_radii_update;
 
-    float min_brightness;
 };
 
 }  // namespace _geom

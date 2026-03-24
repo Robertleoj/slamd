@@ -5,7 +5,6 @@
 namespace slamd {
 namespace geom {
 
-constexpr uint32_t segments = 12;
 struct ArrowMesh {
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> colors;

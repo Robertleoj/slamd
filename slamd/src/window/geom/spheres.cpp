@@ -10,12 +10,11 @@ Spheres::Spheres(
     const std::vector<glm::vec3>& positions,
     const std::vector<glm::vec3>& colors,
     const std::vector<float>& radii,
-    float min_brightness
+    float /*min_brightness*/
 )
     : positions(positions),
       colors(colors),
-      radii(radii),
-      min_brightness(min_brightness) {
+      radii(radii) {
     this->mono = Spheres::make_mono_instanced(positions, colors, radii);
 }
 

@@ -45,8 +45,6 @@ class Spheres : public Geometry {
     std::vector<glm::vec3> positions;
     std::vector<glm::vec3> colors;
     std::vector<float> radii;
-    float min_brightness;
-
     bool pending_trans_update = false;
     bool pending_color_update = false;
 };
