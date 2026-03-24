@@ -1,5 +1,7 @@
 """Stress test for polyline rendering at sharp angles."""
 
+import time
+
 import slamd
 import numpy as np
 
@@ -181,4 +183,4 @@ scene.set_object(
     ),
 )
 
-vis.hang_forever()
+time.sleep(10)

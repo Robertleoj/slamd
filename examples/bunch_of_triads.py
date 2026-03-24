@@ -1,3 +1,5 @@
+import time
+
 import slamd
 import numpy as np
 
@@ -32,7 +34,7 @@ def main():
 
     scene.set_object("/triad_x", slamd.geom.Triad(last_pose_mat, 10))
 
-    vis.hang_forever()
+    time.sleep(10)
 
 
 if __name__ == "__main__":

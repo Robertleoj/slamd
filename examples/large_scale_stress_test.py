@@ -1,5 +1,6 @@
 import slamd
 import numpy as np
+import time
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
         "/point_cloud",
         slamd.geom.PointCloud(points, colors, triad_size * 0.2),
     )
+    time.sleep(10)
 
 
 if __name__ == "__main__":

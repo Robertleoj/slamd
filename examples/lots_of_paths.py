@@ -1,5 +1,6 @@
 import slamd
 import numpy as np
+import time
 
 
 def main():
@@ -17,7 +18,8 @@ def main():
         pth = f"/box_bruh_stuff_long_ass_path_what_is_this_{i}"
 
         scene.set_transform(pth, transform)
-        scene.set_object(pth, slamd.geom.Box())
+        scene.set_object(pth, slamd.geom.Box(np.array([1.0, 1.0, 1.0], dtype=np.float32), np.array([0.8, 0.2, 0.0], dtype=np.float32)))
+    time.sleep(10)
 
 
 if __name__ == "__main__":

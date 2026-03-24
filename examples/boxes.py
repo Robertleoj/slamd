@@ -1,5 +1,7 @@
 """Demo scene using boxes — an exploded Rubik's cube."""
 
+import time
+
 import slamd
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -18,12 +20,12 @@ scene = vis.scene("scene")
 
 # Rubik's cube face colors (classic scheme)
 face_colors = {
-    ( 0,  0,  1): [1.0, 0.0, 0.0],  # front  = red
-    ( 0,  0, -1): [1.0, 0.5, 0.0],  # back   = orange
-    ( 0,  1,  0): [1.0, 1.0, 1.0],  # top    = white
-    ( 0, -1,  0): [1.0, 1.0, 0.0],  # bottom = yellow
-    ( 1,  0,  0): [0.0, 0.0, 0.8],  # right  = blue
-    (-1,  0,  0): [0.0, 0.6, 0.0],  # left   = green
+    (0, 0, 1): [1.0, 0.0, 0.0],  # front  = red
+    (0, 0, -1): [1.0, 0.5, 0.0],  # back   = orange
+    (0, 1, 0): [1.0, 1.0, 1.0],  # top    = white
+    (0, -1, 0): [1.0, 1.0, 0.0],  # bottom = yellow
+    (1, 0, 0): [0.0, 0.0, 0.8],  # right  = blue
+    (-1, 0, 0): [0.0, 0.6, 0.0],  # left   = green
 }
 
 cube_size = 0.45
@@ -47,9 +49,11 @@ for x in range(-1, 2):
                     break
 
             # Slight random tumble for the exploded feel
-            tumble = Rotation.from_rotvec(
-                rng.normal(0, 0.15, size=3)
-            ).as_matrix().astype(np.float32)
+            tumble = (
+                Rotation.from_rotvec(rng.normal(0, 0.15, size=3))
+                .as_matrix()
+                .astype(np.float32)
+            )
 
             scene.set_object(
                 f"/rubik/{x}_{y}_{z}",
@@ -63,4 +67,4 @@ for x in range(-1, 2):
                 make_transform(pos, tumble),
             )
 
-vis.hang_forever()
+time.sleep(10)

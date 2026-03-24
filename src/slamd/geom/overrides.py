@@ -1,5 +1,8 @@
 import numpy as np
 from ..bindings.geom import (
+    Box as Box_internal,
+    CameraFrustum as CameraFrustum_internal,
+    Mesh as Mesh_internal,
     PointCloud as PointCloud_internal,
     Spheres as Spheres_internal,
     PolyLine as PolyLine_internal,
@@ -12,6 +15,57 @@ from .._utils.colors import Color
 from .._utils.handle_input import process_color, process_radii, process_single_color
 
 
+def Box(
+    dims: np.ndarray,
+    color: np.ndarray | tuple[int, int, int] = Color.orange,
+):
+    """An axis-aligned box, centered at the node transform.
+
+    Args:
+        dims: (3,) float32 array, dimensions along x, y, z.
+        color: Either a (3,) float32 array with RGB in (0, 1), or an RGB tuple (0-255).
+    """
+    return Box_internal(dims, process_single_color(color))
+
+
+def CameraFrustum(
+    intrinsics: np.ndarray,
+    image_width: int,
+    image_height: int,
+    image: np.ndarray | None = None,
+    scale: float = 1.0,
+):
+    """A camera frustum wireframe for visualizing camera poses.
+
+    Args:
+        intrinsics: (3, 3) float32 camera intrinsics matrix.
+        image_width: Image width in pixels.
+        image_height: Image height in pixels.
+        image: Optional (H, W, 3) uint8 RGB image to display on the frustum.
+        scale: Size of the rendered frustum.
+    """
+    return CameraFrustum_internal(intrinsics, image_width, image_height, image, scale)
+
+
+def Mesh(
+    positions: np.ndarray,
+    colors: np.ndarray,
+    indices: np.ndarray,
+    normals: np.ndarray | None = None,
+):
+    """A triangle mesh.
+
+    Args:
+        positions: (N, 3) float32 vertex positions.
+        colors: (N, 3) float32 per-vertex RGB colors in (0, 1).
+        indices: (M,) uint32 triangle indices (M must be a multiple of 3).
+        normals: Optional (N, 3) float32 per-vertex normals. Auto-computed if omitted.
+    """
+    if normals is None:
+        return Mesh_internal(positions, colors, indices)
+    return Mesh_internal(positions, colors, indices, normals)
+
+
 def PointCloud(
     positions: np.ndarray,
     colors: np.ndarray | tuple[int, int, int] = Color.black,
@@ -21,15 +75,15 @@ def PointCloud(
     """A 3D point cloud.
 
     Args:
-        positions: An N x 3 array of the 3D point positions.
-        colors: The color of the points. Can be one of:
-            - array of shape N x 3 of RGB colors in (0, 1)
-            - array of shape 3 with a single RGB color in (0, 1)
-            - tuple of an RGB value, 0–255
-        radii: The radius of each point. Can be:
-            - array of shape N with a radius per point
-            - single float for uniform radius
-        min_brightness: Minimum brightness applied to the points.
+        positions: (N, 3) float32 point positions.
+        colors: Per-point or uniform color:
+            - (N, 3) float32 RGB in (0, 1)
+            - (3,) float32 single RGB
+            - RGB tuple (0-255)
+        radii: Per-point or uniform radius:
+            - (N,) float32 array
+            - single float
+        min_brightness: Minimum brightness floor.
     """
     n = positions.shape[0]
     colors_np = process_color(colors, n)
@@ -44,13 +98,13 @@ def PolyLine(
     color: np.ndarray | tuple[int, int, int] = Color.red,
     min_brightness: float = 1.0,
 ):
-    """A 3D polyline made of straight segments.
+    """A 3D polyline tube through a sequence of points.
 
     Args:
-        points: An N x 3 array of points the polyline passes through.
-        thickness: Thickness of the line.
-        color: Either a numpy array with values in (0, 1), or an RGB tuple (0–255).
-        min_brightness: Minimum brightness applied to the line.
+        points: (N, 3) float32 positions the line passes through.
+        thickness: Tube diameter.
+        color: (3,) float32 RGB in (0, 1), or RGB tuple (0-255).
+        min_brightness: Minimum brightness floor.
     """
     color_np = process_single_color(color)
     return PolyLine_internal(points, thickness, color_np, min_brightness)
@@ -61,7 +115,7 @@ def Sphere(radius: float, color: np.ndarray | tuple[int, int, int] = Color.blue)
 
     Args:
         radius: Radius of the sphere.
-        color: Either a numpy array with values in (0, 1), or an RGB tuple (0–255).
+        color: (3,) float32 RGB in (0, 1), or RGB tuple (0-255).
     """
     return Sphere_internal(radius, process_single_color(color))
 
@@ -75,13 +129,13 @@ def Arrows(
     """A collection of 3D arrows from start to end points.
 
     Args:
-        starts: N x 3 array of arrow starting points.
-        ends: N x 3 array of arrow end points.
-        colors: The color of the arrows. Can be:
-            - array of shape N x 3 of RGB colors in (0, 1)
-            - array of shape 3 with a single RGB color in (0, 1)
-            - tuple of an RGB value, 0–255
-        thickness: The thickness of the arrow shafts.
+        starts: (N, 3) float32 arrow start positions.
+        ends: (N, 3) float32 arrow end positions.
+        colors: Per-arrow or uniform color:
+            - (N, 3) float32 RGB in (0, 1)
+            - (3,) float32 single RGB
+            - RGB tuple (0-255)
+        thickness: Arrow shaft thickness.
     """
 
     return Arrows_internal(
@@ -96,10 +150,26 @@ def Plane(
     radius: float = 1.0,
     alpha: float = 0.8,
 ):
+    """A flat circular disc in 3D.
+
+    Args:
+        normal: (3,) float32 plane normal direction.
+        point: (3,) float32 disc center position.
+        color: (3,) float32 RGB in (0, 1), or RGB tuple (0-255).
+        radius: Disc radius.
+        alpha: Opacity, 0.0 (transparent) to 1.0 (opaque).
+    """
     return Plane_internal(normal, point, process_single_color(color), radius, alpha)
 
 
-def Triad(pose: np.ndarray | None = None, scale: float = 1.0, thickness: float = 1.0):
+def Triad(pose: np.ndarray | None = None, scale: float = 1.0, thickness: float = 0.1):
+    """An RGB axis triad (X=red, Y=green, Z=blue).
+
+    Args:
+        pose: Optional 4x4 float32 homogeneous transform matrix. If None, uses identity.
+        scale: Length of each axis arrow.
+        thickness: Thickness of the arrow shafts.
+    """
     return Triad_internal(pose, scale, thickness)
 
 
@@ -109,18 +179,18 @@ def Spheres(
     radii: np.ndarray | float = 1.0,
     min_brightness: float = 0.3,
 ):
-    """3D spheres with per-point color and radius.
+    """A collection of 3D spheres.
 
     Args:
-        positions: An N x 3 array of the 3D positions.
-        colors: The color of the spheres. Can be one of:
-            - array of shape N x 3 of RGB colors in (0, 1)
-            - array of shape 3 with a single RGB color in (0, 1)
-            - tuple of an RGB value, 0–255
-        radii: The radius of each sphere. Can be:
-            - array of shape N with a radius per sphere
-            - single float for uniform radius
-        min_brightness: Minimum brightness applied to the spheres.
+        positions: (N, 3) float32 sphere center positions.
+        colors: Per-sphere or uniform color:
+            - (N, 3) float32 RGB in (0, 1)
+            - (3,) float32 single RGB
+            - RGB tuple (0-255)
+        radii: Per-sphere or uniform radius:
+            - (N,) float32 array
+            - single float
+        min_brightness: Minimum brightness floor.
     """
     n = positions.shape[0]
     colors_np = process_color(colors, n)

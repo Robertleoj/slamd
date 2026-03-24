@@ -4,6 +4,7 @@ Spiral galaxy — 150k stars in a rotating galaxy with arms, bulge, and dust.
 
 import slamd
 import numpy as np
+import time
 
 
 def make_galaxy(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
@@ -74,6 +75,7 @@ def main():
 
     cloud = slamd.geom.PointCloud(positions, colors, 0.08, 0.7)
     scene.set_object("/galaxy", cloud)
+    time.sleep(10)
 
 
 if __name__ == "__main__":
