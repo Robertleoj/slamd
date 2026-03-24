@@ -28,6 +28,7 @@ class SceneView {
     Arcball arcball;
     Camera camera;
     FrameTimer frame_timer;
+    bool show_grid = true;
     _geom::GridXYPlane xy_grid;
     _geom::ArcballIndicator arcball_indicator;
 

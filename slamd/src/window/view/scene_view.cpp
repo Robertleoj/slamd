@@ -79,7 +79,9 @@ void SceneView::render_to_frame_buffer() {
 
     this->tree->render(view, projection);
 
-    this->xy_grid.render(glm::mat4(1.0), view, projection);
+    if (this->show_grid) {
+        this->xy_grid.render(glm::mat4(1.0), view, projection);
+    }
     this->arcball_indicator.render(this->arcball.center, view, projection);
 
     this->frame_buffer.unbind();
@@ -90,6 +92,10 @@ void SceneView::handle_input() {
     if (ImGui::IsWindowFocused()) {
         this->handle_mouse_input();
         this->handle_translation_input();
+        if (ImGui::IsKeyPressed(ImGuiKey_G, false)) {
+            this->show_grid = !this->show_grid;
+            this->mark_dirty();
+        }
         if (ImGui::IsKeyPressed(ImGuiKey_Period, false)) {
             this->arcball.reset();
             this->xy_grid.set_arcball_zoom(this->arcball.radius);

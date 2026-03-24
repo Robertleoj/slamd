@@ -16,6 +16,7 @@ void ControlsHint::render() {
         {"Left-drag", "Rotate"},
         {"Scroll", "Zoom"},
         {".", "Re-center"},
+        {"G", "Toggle grid"},
     };
     const int n_lines = sizeof(lines) / sizeof(lines[0]);
 
