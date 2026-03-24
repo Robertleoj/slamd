@@ -8,8 +8,15 @@ out vec4 FragColor;
 uniform mat4 view;
 uniform float min_brightness;
 uniform float alpha;
+uniform bool peel_enabled;
+uniform sampler2D peel_depth_tex;
 
 void main() {
+    if (peel_enabled) {
+        float prev_depth = texelFetch(peel_depth_tex, ivec2(gl_FragCoord.xy), 0).r;
+        if (gl_FragCoord.z <= prev_depth) discard;
+    }
+
     vec3 norm = normalize(Normal);
 
     // Camera-relative lighting: extract camera forward and right from view matrix

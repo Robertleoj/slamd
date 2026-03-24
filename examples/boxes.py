@@ -55,12 +55,20 @@ for x in range(-1, 2):
                 .astype(np.float32)
             )
 
+            # Stretch cubes along their explosion direction
+            direction = np.array([x, y, z], dtype=np.float32)
+            dist = np.linalg.norm(direction)
+            if dist > 0:
+                stretch = 1.0 + 0.4 * dist
+                direction /= dist
+                dims = np.full(3, cube_size, dtype=np.float32)
+                dims += np.abs(direction) * cube_size * (stretch - 1.0)
+            else:
+                dims = np.full(3, cube_size, dtype=np.float32)
+
             scene.set_object(
                 f"/rubik/{x}_{y}_{z}",
-                slamd.geom.Box(
-                    np.array([cube_size] * 3, dtype=np.float32),
-                    color,
-                ),
+                slamd.geom.Box(dims, color),
             )
             scene.set_transform(
                 f"/rubik/{x}_{y}_{z}",

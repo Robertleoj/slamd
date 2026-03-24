@@ -52,6 +52,7 @@ def Mesh(
     colors: np.ndarray,
     indices: np.ndarray,
     normals: np.ndarray | None = None,
+    alpha: float = 1.0,
 ):
     """A triangle mesh.
 
@@ -60,10 +61,13 @@ def Mesh(
         colors: (N, 3) float32 per-vertex RGB colors in (0, 1).
         indices: (M,) uint32 triangle indices (M must be a multiple of 3).
         normals: Optional (N, 3) float32 per-vertex normals. Auto-computed if omitted.
+        alpha: Opacity, 0.0 (transparent) to 1.0 (opaque).
     """
     if normals is None:
         return Mesh_internal(positions, colors, indices)
-    return Mesh_internal(positions, colors, indices, normals)
+    if alpha == 1.0:
+        return Mesh_internal(positions, colors, indices, normals)
+    return Mesh_internal(positions, colors, indices, normals, alpha)
 
 
 def PointCloud(

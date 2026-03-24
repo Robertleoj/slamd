@@ -498,6 +498,31 @@ void define_geom(
     );
 
     m.def(
+        "Mesh",
+        [](const std::vector<glm::vec3>& positions,
+           const std::vector<glm::vec3>& vertex_colors,
+           const std::vector<uint32_t>& triangle_indices,
+           const std::vector<glm::vec3>& normals,
+           float alpha) {
+            slamd::data::MeshData data = slamd::data::MeshDataBuilder()
+                                             .set_positions(positions)
+                                             .set_colors(vertex_colors)
+                                             .set_indices(triangle_indices)
+                                             .set_normals(normals)
+                                             .set_alpha(alpha)
+                                             .build();
+
+            return slamd::geom::mesh(std::move(data));
+        },
+        py::arg("vertices"),
+        py::arg("vertex_colors"),
+        py::arg("triangle_indices"),
+        py::arg("vertex_normals"),
+        py::arg("alpha"),
+        "Create a SimpleMesh geometry from raw data with transparency"
+    );
+
+    m.def(
         "Sphere",
         &slamd::geom::sphere,
         py::arg("radius") = 1.0f,

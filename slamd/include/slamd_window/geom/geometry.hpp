@@ -13,6 +13,8 @@ class Geometry {
     virtual void
     render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) = 0;
 
+    virtual bool is_transparent() const { return false; }
+
     virtual ~Geometry() = default;
 
     virtual std::optional<slamd::gmath::AABB> bounds();

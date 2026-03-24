@@ -103,7 +103,22 @@ void Tree::render(
     const glm::mat4& view,
     const glm::mat4& projection
 ) const {
-    this->render_recursive(this->root.get(), glm::mat4(1.0), view, projection);
+    this->render_recursive(this->root.get(), glm::mat4(1.0), view, projection, false);
+    this->render_recursive(this->root.get(), glm::mat4(1.0), view, projection, true);
+}
+
+void Tree::render_opaque(
+    const glm::mat4& view,
+    const glm::mat4& projection
+) const {
+    this->render_recursive(this->root.get(), glm::mat4(1.0), view, projection, false);
+}
+
+void Tree::render_transparent(
+    const glm::mat4& view,
+    const glm::mat4& projection
+) const {
+    this->render_recursive(this->root.get(), glm::mat4(1.0), view, projection, true);
 }
 
 void Tree::set_transform(
@@ -142,7 +157,8 @@ void Tree::render_recursive(
     const Node* node,
     const glm::mat4& current_transform,
     const glm::mat4& view,
-    const glm::mat4& projection
+    const glm::mat4& projection,
+    bool transparent_pass
 ) const {
     if (!node->glob_matches.has_value() && !node->checked) {
         return;
@@ -158,11 +174,14 @@ void Tree::render_recursive(
     const auto node_object = node->get_object();
 
     if (node_object.has_value() && node->glob_matches.value_or(true)) {
-        node_object.value()->render(next_transform, view, projection);
+        bool is_transparent = node_object.value()->is_transparent();
+        if (is_transparent == transparent_pass) {
+            node_object.value()->render(next_transform, view, projection);
+        }
     }
 
     for (auto& [_, child] : node->children) {
-        this->render_recursive(child.get(), next_transform, view, projection);
+        this->render_recursive(child.get(), next_transform, view, projection, transparent_pass);
     }
 }
 

@@ -21,6 +21,8 @@ class Tree {
     set_object(const TreePath& path, std::shared_ptr<_geom::Geometry> object);
 
     void render(const glm::mat4& view, const glm::mat4& projection) const;
+    void render_opaque(const glm::mat4& view, const glm::mat4& projection) const;
+    void render_transparent(const glm::mat4& view, const glm::mat4& projection) const;
 
     static std::shared_ptr<Tree> deserialize(
         const slamd::flatb::Tree* serialized,
@@ -42,7 +44,8 @@ class Tree {
         const Node* node,
         const glm::mat4& current_transform,
         const glm::mat4& view,
-        const glm::mat4& projection
+        const glm::mat4& projection,
+        bool transparent_pass
     ) const;
 
     std::optional<slamd::gmath::AABB>

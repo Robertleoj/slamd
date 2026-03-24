@@ -15,6 +15,7 @@ class Plane : public Geometry {
     );
 
     void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;
+    bool is_transparent() const override { return true; }
 
     static std::shared_ptr<Plane> deserialize(
         const slamd::flatb::Plane* plane_fb

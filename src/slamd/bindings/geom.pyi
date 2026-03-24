@@ -70,6 +70,20 @@ def Mesh(
     Create a SimpleMesh geometry from raw data
     """
 
+@typing.overload
+def Mesh(
+    vertices: numpy.ndarray,
+    vertex_colors: numpy.ndarray,
+    triangle_indices: collections.abc.Sequence[
+        typing.SupportsInt | typing.SupportsIndex
+    ],
+    vertex_normals: numpy.ndarray,
+    alpha: typing.SupportsFloat | typing.SupportsIndex,
+) -> slamd.bindings._geom_types.Mesh:
+    """
+    Create a SimpleMesh geometry from raw data with transparency
+    """
+
 def Plane(
     normal: numpy.ndarray,
     point: numpy.ndarray,
