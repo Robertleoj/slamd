@@ -346,7 +346,13 @@ void define_private_geom(
 void define_geom(
     py::module_& m
 ) {
-    m.def("Box", &slamd::geom::box, "Create a Box geometry");
+    m.def(
+        "Box",
+        &slamd::geom::box,
+        py::arg("dims") = glm::vec3(1.0f),
+        py::arg("color") = glm::vec3(0.8f, 0.2f, 0.0f),
+        "Create a Box geometry"
+    );
     m.def(
         "Arrows",
         &slamd::geom::arrows,

@@ -27,7 +27,9 @@ def Arrows(
     Create an Arrows geometry
     """
 
-def Box() -> slamd.bindings._geom_types.Box:
+def Box(
+    dims: numpy.ndarray = ..., color: numpy.ndarray = ...
+) -> slamd.bindings._geom_types.Box:
     """
     Create a Box geometry
     """

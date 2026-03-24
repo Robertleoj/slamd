@@ -453,8 +453,20 @@ inline ::flatbuffers::Offset<Image> CreateImage(
 
 struct Box FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef BoxBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_DIMS = 4,
+    VT_COLOR = 6
+  };
+  const slamd::flatb::Vec3 *dims() const {
+    return GetStruct<const slamd::flatb::Vec3 *>(VT_DIMS);
+  }
+  const slamd::flatb::Vec3 *color() const {
+    return GetStruct<const slamd::flatb::Vec3 *>(VT_COLOR);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<slamd::flatb::Vec3>(verifier, VT_DIMS, 4) &&
+           VerifyField<slamd::flatb::Vec3>(verifier, VT_COLOR, 4) &&
            verifier.EndTable();
   }
 };
@@ -463,6 +475,12 @@ struct BoxBuilder {
   typedef Box Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
+  void add_dims(const slamd::flatb::Vec3 *dims) {
+    fbb_.AddStruct(Box::VT_DIMS, dims);
+  }
+  void add_color(const slamd::flatb::Vec3 *color) {
+    fbb_.AddStruct(Box::VT_COLOR, color);
+  }
   explicit BoxBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -475,8 +493,12 @@ struct BoxBuilder {
 };
 
 inline ::flatbuffers::Offset<Box> CreateBox(
-    ::flatbuffers::FlatBufferBuilder &_fbb) {
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const slamd::flatb::Vec3 *dims = nullptr,
+    const slamd::flatb::Vec3 *color = nullptr) {
   BoxBuilder builder_(_fbb);
+  builder_.add_color(color);
+  builder_.add_dims(dims);
   return builder_.Finish();
 }
 
